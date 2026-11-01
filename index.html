@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PIANCASBALLO SEASON #2 🏔️</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -34,12 +33,10 @@
             }
         }
     </script>
-    <!-- FontAwesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <!-- Tone.js for Sound FX -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -48,7 +45,6 @@
             overflow-x: hidden;
         }
 
-        /* Glassmorphism Styles */
         .glass-panel {
             background: rgba(17, 24, 39, 0.7);
             backdrop-filter: blur(16px);
@@ -69,7 +65,6 @@
             transform: translateY(-2px);
         }
 
-        /* Custom Canvas for Snow Effect */
         #snowCanvas {
             position: fixed;
             top: 0;
@@ -80,7 +75,6 @@
             z-index: 0;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -95,7 +89,6 @@
             background: #0284c7;
         }
 
-        /* Alarm Pulse Effect */
         @keyframes pulse-red {
             0%, 100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
             50% { box-shadow: 0 0 35px rgba(239, 68, 68, 0.9); }
@@ -104,16 +97,31 @@
             animation: pulse-red 0.8s infinite;
             border-color: #ef4444 !important;
         }
+
+        .budget-alert {
+            display: none;
+            margin-top: 0.85rem;
+            padding: 0.7rem 0.9rem;
+            border-radius: 0.9rem;
+            background: rgba(127, 29, 29, 0.28);
+            border: 1px solid rgba(248, 113, 113, 0.55);
+            color: #fecaca;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .budget-alert.show {
+            display: block;
+        }
     </style>
 </head>
 <body class="relative min-h-screen text-slate-100">
-
-    <!-- Canvas per Effetto Neve 3D/2D Smooth -->
     <canvas id="snowCanvas"></canvas>
 
     <div class="relative z-10 max-w-6xl mx-auto px-4 py-8 space-y-10">
-
-        <!-- HEADER HERO -->
         <header class="glass-panel rounded-3xl p-6 md:p-10 text-center relative overflow-hidden border-cyan-500/20">
             <div class="absolute -right-10 -top-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl"></div>
             <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl"></div>
@@ -129,7 +137,6 @@
                 <i class="fa-solid fa-calendar-days text-cyan-400 mr-2"></i> 22 – 24 Dicembre 2026 • Piancavallo
             </p>
 
-            <!-- Live Countdown Clock -->
             <div class="mt-8 grid grid-cols-4 gap-2 md:gap-4 max-w-xl mx-auto">
                 <div class="glass-card rounded-2xl p-3 md:p-4 text-center">
                     <span id="cd-days" class="block text-2xl md:text-4xl font-extrabold text-cyan-400 font-mono">00</span>
@@ -150,9 +157,11 @@
             </div>
         </header>
 
-        <!-- NAV TABS -->
         <nav class="flex flex-wrap justify-center gap-2 md:gap-4 p-2 glass-panel rounded-2xl sticky top-4 z-40">
-            <button onclick="switchTab('programma')" id="tab-btn-programma" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20">
+            <button onclick="switchTab('home')" id="tab-btn-home" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-house"></i> Home
+            </button>
+            <button onclick="switchTab('programma')" id="tab-btn-programma" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
                 <i class="fa-solid fa-clock-rotate-left"></i> Programma
             </button>
             <button onclick="switchTab('mappa')" id="tab-btn-mappa" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
@@ -169,8 +178,88 @@
             </button>
         </nav>
 
-        <!-- SEZIONE 1: PROGRAMMA -->
-        <section id="tab-programma" class="tab-content block space-y-6">
+        <section id="tab-home" class="tab-content block space-y-6">
+            <div class="grid lg:grid-cols-[1.4fr_0.9fr] gap-6">
+                <div class="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden border border-cyan-500/20">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-pink-500/10"></div>
+                    <div class="relative z-10">
+                        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold uppercase tracking-[0.2em]">
+                            <i class="fa-solid fa-snowflake"></i> Pre-flight briefing
+                        </span>
+                        <h2 class="mt-5 text-3xl md:text-5xl font-black leading-tight text-white">
+                            Preparati a una<br>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-300">vacanza da campioni.</span>
+                        </h2>
+                        <p class="mt-4 text-sm md:text-base text-slate-300 max-w-xl">
+                            Programma, sistemazione, budget e lista spesa in un unico dashboard. Qui si organizza il trip perfetto tra piste, birra, valigie e un po’ di caos felice.
+                        </p>
+                        <div class="mt-6 flex flex-wrap gap-3">
+                            <button onclick="switchTab('programma')" class="px-4 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-bold text-sm hover:bg-cyan-400 transition">
+                                <i class="fa-solid fa-route mr-2"></i> Vedi programma
+                            </button>
+                            <button onclick="switchTab('calcolatore')" class="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/60 text-slate-200 font-semibold text-sm hover:border-cyan-400 hover:text-cyan-300 transition">
+                                <i class="fa-solid fa-wallet mr-2"></i> Check budget
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="glass-panel rounded-2xl p-5 border border-indigo-500/30">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs uppercase tracking-[0.2em] text-slate-400">Gruppo</span>
+                            <span class="text-emerald-400 text-xs font-semibold"><i class="fa-solid fa-circle-check mr-1"></i> 7 persone</span>
+                        </div>
+                        <div class="mt-4 text-3xl font-black text-indigo-300 font-mono">Piancavallo</div>
+                        <p class="mt-2 text-xs text-slate-400">3 giorni • 2 notti • 1 missione: divertirsi senza scomporsi.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="glass-card rounded-2xl p-4 border border-cyan-500/20">
+                            <div class="text-[10px] uppercase tracking-[0.2em] text-slate-400">Piste</div>
+                            <div class="mt-2 text-2xl font-black text-cyan-300 font-mono">Full</div>
+                            <div class="text-[10px] text-slate-400">apertura immediata</div>
+                        </div>
+                        <div class="glass-card rounded-2xl p-4 border border-pink-500/20">
+                            <div class="text-[10px] uppercase tracking-[0.2em] text-slate-400">Rientro</div>
+                            <div class="mt-2 text-2xl font-black text-pink-300 font-mono">24</div>
+                            <div class="text-[10px] text-slate-400">dopo vigilia</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="glass-panel rounded-2xl p-5 border border-cyan-500/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-300"><i class="fa-solid fa-calendar-check"></i></div>
+                        <h3 class="font-bold text-cyan-300">Programma</h3>
+                    </div>
+                    <p class="text-sm text-slate-300">Timeline dettagliata per ogni giornata: arrivo, sci day, alba, ritorno a casa.</p>
+                    <button onclick="switchTab('programma')" class="mt-4 text-xs font-semibold text-cyan-300 hover:text-cyan-200">Apri timeline →</button>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-5 border border-indigo-500/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-300"><i class="fa-solid fa-bed"></i></div>
+                        <h3 class="font-bold text-indigo-300">Pernottamento</h3>
+                    </div>
+                    <p class="text-sm text-slate-300">Assegnazione letti, divano e campo ROM con salvataggio automatico nel browser.</p>
+                    <button onclick="switchTab('mappa')" class="mt-4 text-xs font-semibold text-indigo-300 hover:text-indigo-200">Gestisci letti →</button>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-5 border border-pink-500/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-300"><i class="fa-solid fa-sack-dollar"></i></div>
+                        <h3 class="font-bold text-pink-300">Budget</h3>
+                    </div>
+                    <p class="text-sm text-slate-300">Controlla spese vive e parti preparato: se superi 150€ ti avviseremo subito.</p>
+                    <button onclick="switchTab('calcolatore')" class="mt-4 text-xs font-semibold text-pink-300 hover:text-pink-200">Calcola spesa →</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-programma" class="tab-content hidden space-y-6">
             <div class="flex items-center justify-between">
                 <h2 class="text-2xl font-bold flex items-center gap-2">
                     <i class="fa-solid fa-calendar-day text-cyan-400"></i> Timeline del Viaggio
@@ -179,7 +268,6 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-6">
-                <!-- Giorno 1 -->
                 <div class="glass-panel rounded-2xl p-6 border-t-4 border-t-cyan-500 relative flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-4">
@@ -188,22 +276,10 @@
                         </div>
                         <h3 class="text-xl font-bold mb-4">Arrivo & Setup</h3>
                         <ul class="space-y-3 text-sm text-slate-300">
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-car text-cyan-400 mt-1"></i>
-                                <span><strong>Tardo pomeriggio:</strong> Arrivo alla location.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-suitcase text-cyan-400 mt-1"></i>
-                                <span><strong>45 min:</strong> Sistemazione valigie, letti & ambientazione.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-person-skiing text-cyan-400 mt-1"></i>
-                                <span><strong>30 min:</strong> Noleggio attrezzatura da sci.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-utensils text-cyan-400 mt-1"></i>
-                                <span><strong>1h - 1h:15m:</strong> Cena di inizio avventura.</span>
-                            </li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-car text-cyan-400 mt-1"></i><span><strong>Tardo pomeriggio:</strong> Arrivo alla location.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-suitcase text-cyan-400 mt-1"></i><span><strong>45 min:</strong> Sistemazione valigie, letti & ambientazione.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-person-skiing text-cyan-400 mt-1"></i><span><strong>30 min:</strong> Noleggio attrezzatura da sci.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-utensils text-cyan-400 mt-1"></i><span><strong>1h - 1h:15m:</strong> Cena di inizio avventura.</span></li>
                         </ul>
                     </div>
                     <div class="mt-6 pt-4 border-t border-slate-800 text-center">
@@ -211,7 +287,6 @@
                     </div>
                 </div>
 
-                <!-- Giorno 2 -->
                 <div class="glass-panel rounded-2xl p-6 border-t-4 border-t-indigo-500 relative flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-4">
@@ -220,26 +295,11 @@
                         </div>
                         <h3 class="text-xl font-bold mb-4">Full Ski Experience</h3>
                         <ul class="space-y-3 text-sm text-slate-300">
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-bell text-indigo-400 mt-1"></i>
-                                <span><strong>6:00 / 6:30 / 7:00:</strong> Sveglia.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-mug-hot text-indigo-400 mt-1"></i>
-                                <span><strong>1h / 1h:15m:</strong> Colazione + prime necessità <em>("Meno, ottimizziamo tutto!")</em>.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-mountain text-indigo-400 mt-1"></i>
-                                <span><strong>Apertura Piste:</strong> Partenza immediata.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-burger text-indigo-400 mt-1"></i>
-                                <span><strong>Pranzo:</strong> Direttamente sulle piste.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-flag-checkered text-indigo-400 mt-1"></i>
-                                <span><strong>Chiusura Piste:</strong> Ritorno all'alloggio.</span>
-                            </li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-bell text-indigo-400 mt-1"></i><span><strong>6:00 / 6:30 / 7:00:</strong> Sveglia.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-mug-hot text-indigo-400 mt-1"></i><span><strong>1h / 1h:15m:</strong> Colazione + prime necessità <em>("Meno, ottimizziamo tutto!")</em>.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-mountain text-indigo-400 mt-1"></i><span><strong>Apertura Piste:</strong> Partenza immediata.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-burger text-indigo-400 mt-1"></i><span><strong>Pranzo:</strong> Direttamente sulle piste.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-flag-checkered text-indigo-400 mt-1"></i><span><strong>Chiusura Piste:</strong> Ritorno all'alloggio.</span></li>
                         </ul>
                     </div>
                     <div class="mt-6 pt-4 border-t border-slate-800 text-center">
@@ -247,7 +307,6 @@
                     </div>
                 </div>
 
-                <!-- Giorno 3 -->
                 <div class="glass-panel rounded-2xl p-6 border-t-4 border-t-pink-500 relative flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-4">
@@ -256,22 +315,10 @@
                         </div>
                         <h3 class="text-xl font-bold mb-4">Alba & Rientro</h3>
                         <ul class="space-y-3 text-sm text-slate-300">
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-sun text-pink-400 mt-1"></i>
-                                <span><strong>5:30 / 6:00:</strong> Sveglia per vedere l'alba con Belvedere! 🌅</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-coffee text-pink-400 mt-1"></i>
-                                <span><strong>1h / 1h:30m:</strong> Colazione e prime necessità.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-person-skiing text-pink-400 mt-1"></i>
-                                <span><strong>Mattina:</strong> Sci all'apertura piste.</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <i class="fa-solid fa-house-user text-pink-400 mt-1"></i>
-                                <span><strong>Primo pomeriggio:</strong> Ritorno, ripasto/pranzo veloce, recupero risorse e rientro A CASA.</span>
-                            </li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-sun text-pink-400 mt-1"></i><span><strong>5:30 / 6:00:</strong> Sveglia per vedere l'alba con Belvedere! 🌅</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-coffee text-pink-400 mt-1"></i><span><strong>1h / 1h:30m:</strong> Colazione e prime necessità.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-person-skiing text-pink-400 mt-1"></i><span><strong>Mattina:</strong> Sci all'apertura piste.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-house-user text-pink-400 mt-1"></i><span><strong>Primo pomeriggio:</strong> Ritorno, ripasto/pranzo veloce, recupero risorse e rientro A CASA.</span></li>
                         </ul>
                     </div>
                     <div class="mt-6 pt-4 border-t border-slate-800 text-center">
@@ -281,7 +328,6 @@
             </div>
         </section>
 
-        <!-- SEZIONE 2: MAPPA POSTI LETTO -->
         <section id="tab-mappa" class="tab-content hidden space-y-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -296,13 +342,11 @@
             </div>
 
             <div class="grid lg:grid-cols-3 gap-6">
-                <!-- Visual Map Canvas / Layout -->
                 <div class="lg:col-span-2 glass-panel rounded-2xl p-6 relative min-h-[380px] border border-slate-700 flex flex-col justify-between">
                     <div class="absolute top-3 left-3 text-xs font-mono text-slate-500 uppercase flex items-center gap-1">
                         <i class="fa-solid fa-border-all"></i> Piantina Alloggio #1 & #2
                     </div>
 
-                    <!-- Planimetria interattiva stilizzata, coordinata con il dashboard -->
                     <div class="my-6 rounded-xl border border-slate-700 bg-slate-950/60 p-3">
                         <div class="flex items-center justify-between gap-3 mb-2">
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Cartina dei possibili posti letto</span>
@@ -350,14 +394,11 @@
                         </svg>
                     </div>
 
-                    <!-- Room Graphics grid -->
                     <div class="grid grid-cols-12 gap-3 my-6">
-                        <!-- Finestra -->
                         <div class="col-span-12 flex items-center justify-center p-2 border border-dashed border-cyan-500/40 rounded-xl bg-cyan-500/5 text-cyan-400 text-xs font-mono">
                             🪟 FINESTRA / LUMINOSITÀ
                         </div>
 
-                        <!-- Letto 2 -->
                         <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-indigo-500/30">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="font-bold text-sm text-indigo-300">LETTO #2</span>
@@ -369,7 +410,6 @@
                             </div>
                         </div>
 
-                        <!-- Campo ROM -->
                         <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-amber-500/30">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="font-bold text-sm text-amber-300">CAMPO ROM ⛺</span>
@@ -382,7 +422,6 @@
                             </div>
                         </div>
 
-                        <!-- Letto 1 -->
                         <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-cyan-500/30">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="font-bold text-sm text-cyan-300">LETTO #1</span>
@@ -394,7 +433,6 @@
                             </div>
                         </div>
 
-                        <!-- Divano / Opzione 2 -->
                         <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-pink-500/30">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="font-bold text-sm text-pink-300">DIVANO (Opzione #2) 🛋️</span>
@@ -407,27 +445,19 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Specs -->
                     <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-800 text-xs text-slate-400">
                         <span><i class="fa-solid fa-suitcase text-cyan-400 mr-1"></i> Zona Valigie dedicata</span>
                         <span><i class="fa-solid fa-box text-cyan-400 mr-1"></i> Spazio sotto i letti</span>
                     </div>
                 </div>
 
-                <!-- Info Box -->
                 <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between">
                     <div>
                         <h3 class="font-bold text-lg mb-3 text-cyan-300">Regole del Pernottamento</h3>
                         <ul class="space-y-3 text-xs text-slate-300">
-                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
-                                <strong>Opzione 1 (Standard):</strong> 2 su Letto #1, 2 su Letto #2, 3 in Campo ROM.
-                            </li>
-                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
-                                <strong>Opzione 2 (Divano):</strong> Uno o due traslocano sul divano per allargare il Campo ROM.
-                            </li>
-                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
-                                🧹 <strong>Compito:</strong> Spolverare i compartimenti sotto i letti prima di sistemare le valigie!
-                            </li>
+                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50"><strong>Opzione 1 (Standard):</strong> 2 su Letto #1, 2 su Letto #2, 3 in Campo ROM.</li>
+                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50"><strong>Opzione 2 (Divano):</strong> Uno o due traslocano sul divano per allargare il Campo ROM.</li>
+                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">🧹 <strong>Compito:</strong> Spolverare i compartimenti sotto i letti prima di sistemare le valigie!</li>
                         </ul>
                     </div>
                     <div class="mt-4 p-3 bg-cyan-950/40 border border-cyan-800/40 rounded-xl text-center">
@@ -437,7 +467,6 @@
             </div>
         </section>
 
-        <!-- SEZIONE 3: CALCOLATORE COSTI -->
         <section id="tab-calcolatore" class="tab-content hidden space-y-6">
             <div>
                 <h2 class="text-2xl font-bold flex items-center gap-2">
@@ -447,9 +476,7 @@
             </div>
 
             <div class="grid lg:grid-cols-3 gap-6">
-                <!-- Selettori -->
                 <div class="lg:col-span-2 glass-panel rounded-2xl p-6 space-y-6">
-                    <!-- Viveri -->
                     <div class="flex items-center justify-between pb-4 border-b border-slate-800">
                         <div>
                             <h4 class="font-bold text-slate-200">Cibo & Viveri (Quota Fissa)</h4>
@@ -458,7 +485,6 @@
                         <span class="font-mono text-cyan-400 font-bold text-lg">20.00 €</span>
                     </div>
 
-                    <!-- Noleggio Attrezzatura -->
                     <div class="space-y-3 pb-4 border-b border-slate-800">
                         <div class="flex items-center justify-between">
                             <div>
@@ -481,7 +507,6 @@
                         </div>
                     </div>
 
-                    <!-- Spese aggiuntive personalizzabili -->
                     <div class="space-y-3 pt-4 border-t border-slate-800">
                         <div class="flex items-center justify-between gap-4">
                             <div>
@@ -495,7 +520,6 @@
                         </div>
                     </div>
 
-                    <!-- Skipass -->
                     <div class="space-y-3">
                         <div class="flex items-center justify-between">
                             <div>
@@ -508,7 +532,6 @@
                             </label>
                         </div>
 
-                        <!-- Assicurazione Skipass Optional -->
                         <div class="flex items-center justify-between pt-2 pl-4 border-l-2 border-indigo-500/40">
                             <div>
                                 <h5 class="text-xs font-semibold text-slate-300">Aggiungi Assicurazione</h5>
@@ -522,7 +545,6 @@
                     </div>
                 </div>
 
-                <!-- Summary Box -->
                 <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between border-t-4 border-t-cyan-400">
                     <div>
                         <h3 class="font-bold text-lg mb-2 text-slate-100">Totale Estimativo</h3>
@@ -533,27 +555,14 @@
                             <span id="final-total" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-300 font-mono">72.00 €</span>
                         </div>
 
-                        <ul class="space-y-2 text-xs text-slate-400">
-                            <li class="flex justify-between">
-                                <span>Viveri:</span>
-                                <span id="summary-viveri" class="font-mono text-slate-200">20 €</span>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Noleggio:</span>
-                                <span id="summary-nolo" class="font-mono text-slate-200">50 €</span>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Skipass:</span>
-                                <span id="summary-skipass" class="font-mono text-slate-200">22 €</span>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Assicurazione:</span>
-                                <span id="summary-ass" class="font-mono text-slate-200">0 €</span>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Spese aggiuntive:</span>
-                                <span id="summary-extra" class="font-mono text-slate-200">0 €</span>
-                            </li>
+                        <div id="budget-warning" class="budget-alert">Budget elevato in rosso</div>
+
+                        <ul class="space-y-2 text-xs text-slate-400 mt-4">
+                            <li class="flex justify-between"><span>Viveri:</span><span id="summary-viveri" class="font-mono text-slate-200">20 €</span></li>
+                            <li class="flex justify-between"><span>Noleggio:</span><span id="summary-nolo" class="font-mono text-slate-200">50 €</span></li>
+                            <li class="flex justify-between"><span>Skipass:</span><span id="summary-skipass" class="font-mono text-slate-200">22 €</span></li>
+                            <li class="flex justify-between"><span>Assicurazione:</span><span id="summary-ass" class="font-mono text-slate-200">0 €</span></li>
+                            <li class="flex justify-between"><span>Spese aggiuntive:</span><span id="summary-extra" class="font-mono text-slate-200">0 €</span></li>
                         </ul>
                     </div>
 
@@ -564,7 +573,6 @@
             </div>
         </section>
 
-        <!-- SEZIONE 4: OBIETTIVI & RAFFIN WARNING -->
         <section id="tab-obiettivi" class="tab-content hidden space-y-6">
             <div>
                 <h2 class="text-2xl font-bold flex items-center gap-2">
@@ -573,7 +581,6 @@
                 <p class="text-xs text-slate-400">Spunta gli obiettivi man mano che li completate durante la vacanza!</p>
             </div>
 
-            <!-- Warning Box Raffin -->
             <div id="raffin-box" class="glass-panel rounded-2xl p-6 border-2 border-red-500/50 bg-red-950/20 relative overflow-hidden transition-all duration-300">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
                     <div class="flex items-center gap-4">
@@ -583,9 +590,7 @@
                         <div>
                             <span class="px-2 py-0.5 rounded bg-red-500/30 text-red-300 text-[10px] font-bold uppercase tracking-wider">REGOLA SPECIALE #1</span>
                             <h3 class="text-lg font-bold text-red-200 mt-0.5">CLAUSOLA ANTI-SVAPO RAFFIN 🛑</h3>
-                            <p class="text-xs text-slate-300">
-                                Molestare Raffin e picchiarlo se svapa nei luoghi non adatti <em>(+ Alotta inclusa)</em>.
-                            </p>
+                            <p class="text-xs text-slate-300">Molestare Raffin e picchiarlo se svapa nei luoghi non adatti <em>(+ Alotta inclusa)</em>.</p>
                         </div>
                     </div>
                     <button onclick="triggerRaffinAlarm()" class="px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-600/30 transition flex items-center gap-2 shrink-0">
@@ -594,16 +599,12 @@
                 </div>
             </div>
 
-            <!-- Lista Obiettivi spuntabile -->
             <div class="glass-panel rounded-2xl p-6">
                 <h3 class="font-bold text-lg mb-4 text-cyan-300">Checklist Obiettivi Ufficiali</h3>
-                <div class="grid md:grid-cols-2 gap-4" id="goals-container">
-                    <!-- Goals injected by JS -->
-                </div>
+                <div class="grid md:grid-cols-2 gap-4" id="goals-container"></div>
             </div>
         </section>
 
-        <!-- SEZIONE 5: LISTE SPESA & PACKING -->
         <section id="tab-liste" class="tab-content hidden space-y-6">
             <div>
                 <h2 class="text-2xl font-bold flex items-center gap-2">
@@ -613,35 +614,24 @@
             </div>
 
             <div class="grid md:grid-cols-2 gap-6">
-                <!-- Lista Spesa -->
                 <div class="glass-panel rounded-2xl p-6">
                     <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
-                        <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
-                            <i class="fa-solid fa-cart-shopping"></i> Lista della Spesa
-                        </h3>
+                        <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2"><i class="fa-solid fa-cart-shopping"></i> Lista della Spesa</h3>
                         <span class="text-xs text-slate-400">Budget Viveri 140€</span>
                     </div>
-                    <div class="space-y-2.5" id="grocery-list-container">
-                        <!-- Items injected by JS -->
-                    </div>
+                    <div class="space-y-2.5" id="grocery-list-container"></div>
                 </div>
 
-                <!-- Vestiario & Altro -->
                 <div class="glass-panel rounded-2xl p-6">
                     <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
-                        <h3 class="font-bold text-lg text-cyan-400 flex items-center gap-2">
-                            <i class="fa-solid fa-shirt"></i> Vestiario & Equipaggiamento
-                        </h3>
+                        <h3 class="font-bold text-lg text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-shirt"></i> Vestiario & Equipaggiamento</h3>
                         <span class="text-xs text-slate-400">Da portare da casa</span>
                     </div>
-                    <div class="space-y-2.5" id="packing-list-container">
-                        <!-- Items injected by JS -->
-                    </div>
+                    <div class="space-y-2.5" id="packing-list-container"></div>
                 </div>
             </div>
         </section>
 
-        <!-- FOOTER -->
         <footer class="text-center py-6 text-xs text-slate-500 border-t border-slate-800/80 flex flex-col items-center gap-2">
             <p>PIANCASBALLO SEASON #2 • 22-24 Dicembre 2026</p>
             <div class="flex gap-4">
@@ -650,10 +640,8 @@
                 <span><i class="fa-solid fa-broom text-indigo-400"></i> Casa Pulita</span>
             </div>
         </footer>
-
     </div>
 
-    <!-- MODAL / NOTIFICATION -->
     <div id="modal-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="glass-panel border-2 border-red-500 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 animate-bounce">
             <div class="w-16 h-16 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto border border-red-500/40">
@@ -669,9 +657,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT APP LOGIC -->
     <script>
-        // --- 1. SNOW EFFECT (Canvas) ---
         const canvas = document.getElementById('snowCanvas');
         const ctx = canvas.getContext('2d');
         let flakes = [];
@@ -727,7 +713,6 @@
         }
         drawSnow();
 
-        // --- 2. COUNTDOWN TIMER ---
         const targetDate = new Date("December 22, 2026 17:00:00").getTime();
 
         function updateCountdown() {
@@ -754,7 +739,6 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // --- 3. TAB SWITCHING ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -768,9 +752,8 @@
             activeBtn.classList.remove('text-slate-400');
         }
 
-        // --- 4. CALCULATOR LOGIC ---
         function recalculateTotal() {
-            let total = 20; // Base viveri
+            let total = 20;
             const noloChecked = document.getElementById('calc-nolo').checked;
             const skipassChecked = document.getElementById('calc-skipass').checked;
             const assChecked = document.getElementById('calc-ass').checked;
@@ -784,7 +767,7 @@
             }
 
             let skipassVal = skipassChecked ? 22 : 0;
-            let assVal = assChecked ? 5 : 0; // Stima 5€ per assicurazione
+            let assVal = assChecked ? 5 : 0;
             const extraInput = document.getElementById('calc-extra');
             let extraVal = extraInput ? Math.max(0, parseFloat(extraInput.value) || 0) : 0;
 
@@ -796,9 +779,15 @@
             document.getElementById('summary-skipass').innerText = skipassVal + " €";
             document.getElementById('summary-ass').innerText = assVal + " €";
             document.getElementById('summary-extra').innerText = extraVal.toFixed(2) + " €";
+
+            const budgetWarning = document.getElementById('budget-warning');
+            if (total > 150) {
+                budgetWarning.classList.add('show');
+            } else {
+                budgetWarning.classList.remove('show');
+            }
         }
 
-        // --- 5. OBJECTIVES & LISTS DATA & LOGIC ---
         const goalsData = [
             "Sciare con gli sci in parallelo ⛷️",
             "Fare una pista senza cadere ❄️",
@@ -810,8 +799,8 @@
         ];
 
         const groceryData = [
-            "Pasta", "Sughi (Pomodoro e Ragù)", "Cotechino", "Lenticchie", 
-            "Frico", "Polenta", "Colazione (Merendine, Latte, Succhi)", 
+            "Pasta", "Sughi (Pomodoro e Ragù)", "Cotechino", "Lenticchie",
+            "Frico", "Polenta", "Colazione (Merendine, Latte, Succhi)",
             "Merende", "Acqua (Naturale > Frizzante)", "Purè", "Verdura"
         ];
 
@@ -849,7 +838,6 @@
         renderChecklist('grocery-list-container', groceryData, 'pianca_grocery');
         renderChecklist('packing-list-container', packingData, 'pianca_packing');
 
-        // --- 6. BED ALLOCATION SAVE/LOAD ---
         const bedInputs = ['bed-l2-1', 'bed-l2-2', 'bed-rom-1', 'bed-rom-2', 'bed-rom-3', 'bed-l1-1', 'bed-l1-2', 'bed-divano-1'];
 
         function saveBeds() {
@@ -870,7 +858,6 @@
         }
         loadBeds();
 
-        // La cartina porta direttamente ai campi della zona selezionata.
         document.querySelectorAll('[data-bed-zone]').forEach(zone => {
             const focusZone = () => {
                 const key = zone.getAttribute('data-bed-zone');
@@ -908,9 +895,7 @@
             localStorage.removeItem('pianca_beds');
         }
 
-        // --- 7. ALARM SOUND & MODAL LOGIC ---
         function triggerRaffinAlarm() {
-            // Sound Synthesizer via Tone.js
             try {
                 const synth = new Tone.Synth().toDestination();
                 const now = Tone.now();
@@ -929,9 +914,9 @@
             document.getElementById('raffin-box').classList.remove('alarm-active');
         }
 
-        // Start animation frame fallback
         window.onload = function() {
             recalculateTotal();
+            switchTab('home');
         }
     </script>
 </body>
