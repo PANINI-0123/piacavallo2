@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIANCASBALLO SEASON #2 🏔️</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ice: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        },
+                        neon: {
+                            cyan: '#00f3ff',
+                            pink: '#ff007f',
+                            green: '#39ff14',
+                            amber: '#ffb703'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Tone.js for Sound FX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Custom Canvas for Snow Effect */
+        #snowCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+
+        /* Alarm Pulse Effect */
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(239, 68, 68, 0.9); }
+        }
+        .alarm-active {
+            animation: pulse-red 0.8s infinite;
+            border-color: #ef4444 !important;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-slate-100">
+
+    <!-- Canvas per Effetto Neve 3D/2D Smooth -->
+    <canvas id="snowCanvas"></canvas>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-4 py-8 space-y-10">
+
+        <!-- HEADER HERO -->
+        <header class="glass-panel rounded-3xl p-6 md:p-10 text-center relative overflow-hidden border-cyan-500/20">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl"></div>
+
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs md:text-sm font-semibold tracking-wider uppercase mb-4">
+                <i class="fa-solid fa-snowflake animate-spin" style="animation-duration: 10s;"></i> Winter Expedition Official Dashboard
+            </div>
+
+            <h1 class="text-4xl md:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-200 to-indigo-400 mb-2">
+                PIANCASBALLO <span class="text-cyan-400 font-mono">SEASON #2</span>
+            </h1>
+            <p class="text-slate-400 text-base md:text-lg font-medium">
+                <i class="fa-solid fa-calendar-days text-cyan-400 mr-2"></i> 22 – 24 Dicembre 2026 • Piancavallo
+            </p>
+
+            <!-- Live Countdown Clock -->
+            <div class="mt-8 grid grid-cols-4 gap-2 md:gap-4 max-w-xl mx-auto">
+                <div class="glass-card rounded-2xl p-3 md:p-4 text-center">
+                    <span id="cd-days" class="block text-2xl md:text-4xl font-extrabold text-cyan-400 font-mono">00</span>
+                    <span class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider">Giorni</span>
+                </div>
+                <div class="glass-card rounded-2xl p-3 md:p-4 text-center">
+                    <span id="cd-hours" class="block text-2xl md:text-4xl font-extrabold text-cyan-400 font-mono">00</span>
+                    <span class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider">Ore</span>
+                </div>
+                <div class="glass-card rounded-2xl p-3 md:p-4 text-center">
+                    <span id="cd-mins" class="block text-2xl md:text-4xl font-extrabold text-cyan-400 font-mono">00</span>
+                    <span class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider">Minuti</span>
+                </div>
+                <div class="glass-card rounded-2xl p-3 md:p-4 text-center">
+                    <span id="cd-secs" class="block text-2xl md:text-4xl font-extrabold text-pink-500 font-mono">00</span>
+                    <span class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider">Secondi</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- NAV TABS -->
+        <nav class="flex flex-wrap justify-center gap-2 md:gap-4 p-2 glass-panel rounded-2xl sticky top-4 z-40">
+            <button onclick="switchTab('programma')" id="tab-btn-programma" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-clock-rotate-left"></i> Programma
+            </button>
+            <button onclick="switchTab('mappa')" id="tab-btn-mappa" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-solid fa-bed"></i> Posti Letto
+            </button>
+            <button onclick="switchTab('calcolatore')" id="tab-btn-calcolatore" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-solid fa-calculator"></i> Calcolatore Costi
+            </button>
+            <button onclick="switchTab('obiettivi')" id="tab-btn-obiettivi" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-solid fa-bullseye"></i> Obiettivi & Rules
+            </button>
+            <button onclick="switchTab('liste')" id="tab-btn-liste" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+                <i class="fa-solid fa-list-check"></i> Spesa & Packing
+            </button>
+        </nav>
+
+        <!-- SEZIONE 1: PROGRAMMA -->
+        <section id="tab-programma" class="tab-content block space-y-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-day text-cyan-400"></i> Timeline del Viaggio
+                </h2>
+                <span class="text-xs text-slate-400">3 Giorni Intensive</span>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Giorno 1 -->
+                <div class="glass-panel rounded-2xl p-6 border-t-4 border-t-cyan-500 relative flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="px-3 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-lg text-xs font-bold">22 DICEMBRE</span>
+                            <span class="text-xs text-slate-400">Giorno 1</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Arrivo & Setup</h3>
+                        <ul class="space-y-3 text-sm text-slate-300">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-car text-cyan-400 mt-1"></i>
+                                <span><strong>Tardo pomeriggio:</strong> Arrivo alla location.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-suitcase text-cyan-400 mt-1"></i>
+                                <span><strong>45 min:</strong> Sistemazione valigie, letti & ambientazione.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-person-skiing text-cyan-400 mt-1"></i>
+                                <span><strong>30 min:</strong> Noleggio attrezzatura da sci.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-utensils text-cyan-400 mt-1"></i>
+                                <span><strong>1h - 1h:15m:</strong> Cena di inizio avventura.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-800 text-center">
+                        <span class="inline-block px-3 py-1 rounded-full bg-slate-800 text-cyan-300 text-xs font-mono">Tempo libero 🎉</span>
+                    </div>
+                </div>
+
+                <!-- Giorno 2 -->
+                <div class="glass-panel rounded-2xl p-6 border-t-4 border-t-indigo-500 relative flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 rounded-lg text-xs font-bold">23 DICEMBRE</span>
+                            <span class="text-xs text-amber-400 font-bold"><i class="fa-solid fa-fire"></i> SKI DAY</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Full Ski Experience</h3>
+                        <ul class="space-y-3 text-sm text-slate-300">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-bell text-indigo-400 mt-1"></i>
+                                <span><strong>6:00 / 6:30 / 7:00:</strong> Sveglia.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-mug-hot text-indigo-400 mt-1"></i>
+                                <span><strong>1h / 1h:15m:</strong> Colazione + prime necessità <em>("Meno, ottimizziamo tutto!")</em>.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-mountain text-indigo-400 mt-1"></i>
+                                <span><strong>Apertura Piste:</strong> Partenza immediata.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-burger text-indigo-400 mt-1"></i>
+                                <span><strong>Pranzo:</strong> Direttamente sulle piste.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-flag-checkered text-indigo-400 mt-1"></i>
+                                <span><strong>Chiusura Piste:</strong> Ritorno all'alloggio.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-800 text-center">
+                        <span class="inline-block px-3 py-1 rounded-full bg-slate-800 text-indigo-300 text-xs font-mono">Tempo libero 🎿</span>
+                    </div>
+                </div>
+
+                <!-- Giorno 3 -->
+                <div class="glass-panel rounded-2xl p-6 border-t-4 border-t-pink-500 relative flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="px-3 py-1 bg-pink-500/10 text-pink-400 border border-pink-500/30 rounded-lg text-xs font-bold">24 DICEMBRE</span>
+                            <span class="text-xs text-slate-400">Giorno 3</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">Alba & Rientro</h3>
+                        <ul class="space-y-3 text-sm text-slate-300">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-sun text-pink-400 mt-1"></i>
+                                <span><strong>5:30 / 6:00:</strong> Sveglia per vedere l'alba con Belvedere! 🌅</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-coffee text-pink-400 mt-1"></i>
+                                <span><strong>1h / 1h:30m:</strong> Colazione e prime necessità.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-person-skiing text-pink-400 mt-1"></i>
+                                <span><strong>Mattina:</strong> Sci all'apertura piste.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-house-user text-pink-400 mt-1"></i>
+                                <span><strong>Primo pomeriggio:</strong> Ritorno, ripasto/pranzo veloce, recupero risorse e rientro A CASA.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-800 text-center">
+                        <span class="inline-block px-3 py-1 rounded-full bg-slate-800 text-pink-300 text-xs font-mono">Rientro per Vigilia 🎄</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEZIONE 2: MAPPA POSTI LETTO -->
+        <section id="tab-mappa" class="tab-content hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot text-cyan-400"></i> Planimetria & Assegnazione Letto
+                    </h2>
+                    <p class="text-xs text-slate-400">Fai clic sui letti o digita i nomi dei 7 componenti per organizzare il pernottamento.</p>
+                </div>
+                <button onclick="resetBeds()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg transition text-slate-300">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Reset Assegnazioni
+                </button>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Visual Map Canvas / Layout -->
+                <div class="lg:col-span-2 glass-panel rounded-2xl p-6 relative min-h-[380px] border border-slate-700 flex flex-col justify-between">
+                    <div class="absolute top-3 left-3 text-xs font-mono text-slate-500 uppercase flex items-center gap-1">
+                        <i class="fa-solid fa-border-all"></i> Piantina Alloggio #1 & #2
+                    </div>
+
+                    <!-- Planimetria interattiva stilizzata, coordinata con il dashboard -->
+                    <div class="my-6 rounded-xl border border-slate-700 bg-slate-950/60 p-3">
+                        <div class="flex items-center justify-between gap-3 mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Cartina dei possibili posti letto</span>
+                            <span class="text-[10px] text-slate-500">Seleziona una zona per assegnare i posti</span>
+                        </div>
+                        <svg viewBox="0 0 640 330" role="img" aria-label="Planimetria interattiva con finestra, Letto 2, Campo ROM, Letto 1, divano e mobile" class="w-full h-auto">
+                            <defs>
+                                <linearGradient id="roomFill" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#0f2537"/>
+                                    <stop offset="100%" stop-color="#111827"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M70 40 H570 V285 H70 Z" fill="url(#roomFill)" stroke="#64748b" stroke-width="3" stroke-linejoin="round"/>
+                            <path d="M70 90 H42 V230 H70" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="5 5"/>
+                            <text x="25" y="160" fill="#7dd3fc" font-size="13" text-anchor="middle" transform="rotate(-90 25 160)">FINESTRA</text>
+                            <g class="floor-zone" data-bed-zone="l2" role="button" tabindex="0" aria-label="Assegna persone al Letto 2" style="cursor:pointer">
+                                <rect x="95" y="55" width="220" height="70" rx="10" fill="#312e81" fill-opacity=".65" stroke="#818cf8" stroke-width="2"/>
+                                <rect x="106" y="65" width="42" height="49" rx="5" fill="#a5b4fc" fill-opacity=".25" stroke="#a5b4fc"/>
+                                <rect x="154" y="65" width="42" height="49" rx="5" fill="#a5b4fc" fill-opacity=".25" stroke="#a5b4fc"/>
+                                <text x="235" y="84" fill="#c7d2fe" font-size="16" font-weight="700" text-anchor="middle">LETTO #2</text>
+                                <text x="235" y="104" fill="#c7d2fe" font-size="12" text-anchor="middle">2 posti</text>
+                            </g>
+                            <g class="floor-zone" data-bed-zone="rom" role="button" tabindex="0" aria-label="Assegna persone al Campo ROM" style="cursor:pointer">
+                                <rect x="335" y="55" width="210" height="70" rx="10" fill="#78350f" fill-opacity=".55" stroke="#fbbf24" stroke-width="2"/>
+                                <path d="M365 108 L390 68 L415 108 Z" fill="#fbbf24" fill-opacity=".2" stroke="#fcd34d" stroke-width="2"/>
+                                <text x="472" y="84" fill="#fde68a" font-size="16" font-weight="700" text-anchor="middle">CAMPO ROM</text>
+                                <text x="472" y="104" fill="#fde68a" font-size="12" text-anchor="middle">3 posti</text>
+                            </g>
+                            <g class="floor-zone" data-bed-zone="l1" role="button" tabindex="0" aria-label="Assegna persone al Letto 1" style="cursor:pointer">
+                                <rect x="95" y="145" width="220" height="70" rx="10" fill="#164e63" fill-opacity=".7" stroke="#22d3ee" stroke-width="2"/>
+                                <rect x="106" y="155" width="42" height="49" rx="5" fill="#67e8f9" fill-opacity=".22" stroke="#67e8f9"/>
+                                <rect x="154" y="155" width="42" height="49" rx="5" fill="#67e8f9" fill-opacity=".22" stroke="#67e8f9"/>
+                                <text x="235" y="174" fill="#a5f3fc" font-size="16" font-weight="700" text-anchor="middle">LETTO #1</text>
+                                <text x="235" y="194" fill="#a5f3fc" font-size="12" text-anchor="middle">2 posti</text>
+                            </g>
+                            <g class="floor-zone" data-bed-zone="divano" role="button" tabindex="0" aria-label="Assegna persona al divano" style="cursor:pointer">
+                                <rect x="335" y="145" width="210" height="70" rx="10" fill="#831843" fill-opacity=".5" stroke="#f472b6" stroke-width="2"/>
+                                <rect x="355" y="163" width="56" height="32" rx="7" fill="#f9a8d4" fill-opacity=".2" stroke="#f9a8d4" stroke-width="2"/>
+                                <text x="472" y="174" fill="#fbcfe8" font-size="16" font-weight="700" text-anchor="middle">DIVANO</text>
+                                <text x="472" y="194" fill="#fbcfe8" font-size="12" text-anchor="middle">1-2 posti</text>
+                            </g>
+                            <rect x="225" y="235" width="170" height="30" rx="6" fill="#334155" stroke="#64748b"/>
+                            <text x="310" y="254" fill="#cbd5e1" font-size="12" text-anchor="middle">MOBILE / ZONA VALIGIE</text>
+                            <text x="320" y="310" fill="#64748b" font-size="11" text-anchor="middle">Schema indicativo, non in scala</text>
+                        </svg>
+                    </div>
+
+                    <!-- Room Graphics grid -->
+                    <div class="grid grid-cols-12 gap-3 my-6">
+                        <!-- Finestra -->
+                        <div class="col-span-12 flex items-center justify-center p-2 border border-dashed border-cyan-500/40 rounded-xl bg-cyan-500/5 text-cyan-400 text-xs font-mono">
+                            🪟 FINESTRA / LUMINOSITÀ
+                        </div>
+
+                        <!-- Letto 2 -->
+                        <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-indigo-500/30">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-sm text-indigo-300">LETTO #2</span>
+                                <span class="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded">2 Posti</span>
+                            </div>
+                            <div class="space-y-2">
+                                <input type="text" id="bed-l2-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-400">
+                                <input type="text" id="bed-l2-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-400">
+                            </div>
+                        </div>
+
+                        <!-- Campo ROM -->
+                        <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-amber-500/30">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-sm text-amber-300">CAMPO ROM ⛺</span>
+                                <span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded">3 Posti</span>
+                            </div>
+                            <div class="space-y-2">
+                                <input type="text" id="bed-rom-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                                <input type="text" id="bed-rom-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                                <input type="text" id="bed-rom-3" oninput="saveBeds()" placeholder="Persona 3" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                            </div>
+                        </div>
+
+                        <!-- Letto 1 -->
+                        <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-cyan-500/30">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-sm text-cyan-300">LETTO #1</span>
+                                <span class="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">2 Posti</span>
+                            </div>
+                            <div class="space-y-2">
+                                <input type="text" id="bed-l1-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+                                <input type="text" id="bed-l1-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+                            </div>
+                        </div>
+
+                        <!-- Divano / Opzione 2 -->
+                        <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-pink-500/30">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-sm text-pink-300">DIVANO (Opzione #2) 🛋️</span>
+                                <span class="text-xs bg-pink-500/20 text-pink-400 px-2 py-0.5 rounded">1-2 Posti</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mb-2">*Uno o due possono spostarsi qui per stare più comodi.</p>
+                            <div class="space-y-2">
+                                <input type="text" id="bed-divano-1" oninput="saveBeds()" placeholder="Persona sul divano" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-pink-400">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Specs -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-800 text-xs text-slate-400">
+                        <span><i class="fa-solid fa-suitcase text-cyan-400 mr-1"></i> Zona Valigie dedicata</span>
+                        <span><i class="fa-solid fa-box text-cyan-400 mr-1"></i> Spazio sotto i letti</span>
+                    </div>
+                </div>
+
+                <!-- Info Box -->
+                <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-lg mb-3 text-cyan-300">Regole del Pernottamento</h3>
+                        <ul class="space-y-3 text-xs text-slate-300">
+                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
+                                <strong>Opzione 1 (Standard):</strong> 2 su Letto #1, 2 su Letto #2, 3 in Campo ROM.
+                            </li>
+                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
+                                <strong>Opzione 2 (Divano):</strong> Uno o due traslocano sul divano per allargare il Campo ROM.
+                            </li>
+                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">
+                                🧹 <strong>Compito:</strong> Spolverare i compartimenti sotto i letti prima di sistemare le valigie!
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-4 p-3 bg-cyan-950/40 border border-cyan-800/40 rounded-xl text-center">
+                        <p class="text-xs text-cyan-200">Assegnazioni salvate in automatico in questo browser.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEZIONE 3: CALCOLATORE COSTI -->
+        <section id="tab-calcolatore" class="tab-content hidden space-y-6">
+            <div>
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-cyan-400"></i> Calcolatore Quota x Persona
+                </h2>
+                <p class="text-xs text-slate-400">Seleziona le opzioni che ti riguardano per vedere la stima della tua spesa.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Selettori -->
+                <div class="lg:col-span-2 glass-panel rounded-2xl p-6 space-y-6">
+                    <!-- Viveri -->
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                        <div>
+                            <h4 class="font-bold text-slate-200">Cibo & Viveri (Quota Fissa)</h4>
+                            <p class="text-xs text-slate-400">20€ a testa (Totale 140€ per 7 persone)</p>
+                        </div>
+                        <span class="font-mono text-cyan-400 font-bold text-lg">20.00 €</span>
+                    </div>
+
+                    <!-- Noleggio Attrezzatura -->
+                    <div class="space-y-3 pb-4 border-b border-slate-800">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-bold text-slate-200">Noleggio Attrezzatura (2 Giorni)</h4>
+                                <p class="text-xs text-slate-400">Sci + Bastoni + Casco + Scarponi</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="calc-nolo" onchange="recalculateTotal()" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                            </label>
+                        </div>
+                        <div id="nolo-price-selector" class="flex gap-4 items-center text-xs">
+                            <span class="text-slate-400">Prezzo stimato:</span>
+                            <label class="cursor-pointer flex items-center gap-1.5 text-slate-300">
+                                <input type="radio" name="nolo-cost" value="50" onchange="recalculateTotal()" checked class="accent-cyan-400"> 50 €
+                            </label>
+                            <label class="cursor-pointer flex items-center gap-1.5 text-slate-300">
+                                <input type="radio" name="nolo-cost" value="55" onchange="recalculateTotal()" class="accent-cyan-400"> 55 €
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Spese aggiuntive personalizzabili -->
+                    <div class="space-y-3 pt-4 border-t border-slate-800">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <h4 class="font-bold text-slate-200">Spese aggiuntive</h4>
+                                <p class="text-xs text-slate-400">Importo extra a persona, deciso da te</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="calc-extra" min="0" step="0.50" value="0" oninput="recalculateTotal()" aria-label="Spese aggiuntive in euro" class="w-24 bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400">
+                                <span class="text-sm text-slate-400">€</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skipass -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-bold text-slate-200">Skipass (Totale soggiorno)</h4>
+                                <p class="text-xs text-slate-400">22€ totali per entrambi i giorni</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="calc-skipass" onchange="recalculateTotal()" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                            </label>
+                        </div>
+
+                        <!-- Assicurazione Skipass Optional -->
+                        <div class="flex items-center justify-between pt-2 pl-4 border-l-2 border-indigo-500/40">
+                            <div>
+                                <h5 class="text-xs font-semibold text-slate-300">Aggiungi Assicurazione</h5>
+                                <p class="text-[10px] text-slate-400">Infortuni / Responsabilità civile</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="calc-ass" onchange="recalculateTotal()" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Box -->
+                <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between border-t-4 border-t-cyan-400">
+                    <div>
+                        <h3 class="font-bold text-lg mb-2 text-slate-100">Totale Estimativo</h3>
+                        <p class="text-xs text-slate-400 mb-6">Quota calcolata a persona per l'intera durata del soggiorno.</p>
+
+                        <div class="text-center p-6 bg-slate-900/80 rounded-2xl border border-slate-800 mb-4">
+                            <span class="text-xs text-slate-400 block font-mono uppercase">Importo Singolo</span>
+                            <span id="final-total" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-300 font-mono">72.00 €</span>
+                        </div>
+
+                        <ul class="space-y-2 text-xs text-slate-400">
+                            <li class="flex justify-between">
+                                <span>Viveri:</span>
+                                <span id="summary-viveri" class="font-mono text-slate-200">20 €</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>Noleggio:</span>
+                                <span id="summary-nolo" class="font-mono text-slate-200">50 €</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>Skipass:</span>
+                                <span id="summary-skipass" class="font-mono text-slate-200">22 €</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>Assicurazione:</span>
+                                <span id="summary-ass" class="font-mono text-slate-200">0 €</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>Spese aggiuntive:</span>
+                                <span id="summary-extra" class="font-mono text-slate-200">0 €</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-800 text-[10px] text-slate-500 text-center">
+                        *Nota: I prezzi sono basati sui dati indicati nei fogli (Quota tot ~92/97€).
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEZIONE 4: OBIETTIVI & RAFFIN WARNING -->
+        <section id="tab-obiettivi" class="tab-content hidden space-y-6">
+            <div>
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-bullseye text-cyan-400"></i> Obiettivi di Gruppo & Regolamento
+                </h2>
+                <p class="text-xs text-slate-400">Spunta gli obiettivi man mano che li completate durante la vacanza!</p>
+            </div>
+
+            <!-- Warning Box Raffin -->
+            <div id="raffin-box" class="glass-panel rounded-2xl p-6 border-2 border-red-500/50 bg-red-950/20 relative overflow-hidden transition-all duration-300">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 text-2xl shrink-0 border border-red-500/40">
+                            <i class="fa-solid fa-triangle-exclamation animate-bounce"></i>
+                        </div>
+                        <div>
+                            <span class="px-2 py-0.5 rounded bg-red-500/30 text-red-300 text-[10px] font-bold uppercase tracking-wider">REGOLA SPECIALE #1</span>
+                            <h3 class="text-lg font-bold text-red-200 mt-0.5">CLAUSOLA ANTI-SVAPO RAFFIN 🛑</h3>
+                            <p class="text-xs text-slate-300">
+                                Molestare Raffin e picchiarlo se svapa nei luoghi non adatti <em>(+ Alotta inclusa)</em>.
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="triggerRaffinAlarm()" class="px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-600/30 transition flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-bullhorn"></i> SUONA ALLARME SVAPO
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista Obiettivi spuntabile -->
+            <div class="glass-panel rounded-2xl p-6">
+                <h3 class="font-bold text-lg mb-4 text-cyan-300">Checklist Obiettivi Ufficiali</h3>
+                <div class="grid md:grid-cols-2 gap-4" id="goals-container">
+                    <!-- Goals injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SEZIONE 5: LISTE SPESA & PACKING -->
+        <section id="tab-liste" class="tab-content hidden space-y-6">
+            <div>
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-cyan-400"></i> Liste Spesa & Valigia
+                </h2>
+                <p class="text-xs text-slate-400">Tenete traccia di cosa comprare e cosa mettere nello zaino prima di partire.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Lista Spesa -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
+                        <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
+                            <i class="fa-solid fa-cart-shopping"></i> Lista della Spesa
+                        </h3>
+                        <span class="text-xs text-slate-400">Budget Viveri 140€</span>
+                    </div>
+                    <div class="space-y-2.5" id="grocery-list-container">
+                        <!-- Items injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Vestiario & Altro -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
+                        <h3 class="font-bold text-lg text-cyan-400 flex items-center gap-2">
+                            <i class="fa-solid fa-shirt"></i> Vestiario & Equipaggiamento
+                        </h3>
+                        <span class="text-xs text-slate-400">Da portare da casa</span>
+                    </div>
+                    <div class="space-y-2.5" id="packing-list-container">
+                        <!-- Items injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center py-6 text-xs text-slate-500 border-t border-slate-800/80 flex flex-col items-center gap-2">
+            <p>PIANCASBALLO SEASON #2 • 22-24 Dicembre 2026</p>
+            <div class="flex gap-4">
+                <span><i class="fa-solid fa-snowflake text-cyan-500"></i> Sci Parallelo</span>
+                <span><i class="fa-solid fa-beer-mug-empty text-amber-500"></i> Buona Birra</span>
+                <span><i class="fa-solid fa-broom text-indigo-400"></i> Casa Pulita</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- MODAL / NOTIFICATION -->
+    <div id="modal-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel border-2 border-red-500 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 animate-bounce">
+            <div class="w-16 h-16 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto border border-red-500/40">
+                <i class="fa-solid fa-ban"></i>
+            </div>
+            <h3 class="text-xl font-black text-red-400">ALLARME SVAPO ATTIVATO!</h3>
+            <p class="text-xs text-slate-300">
+                Raffin è stato avvistato con la svapa in un luogo non idoneo. Procedere immediatamente alle sanzioni previste! 🚫💨
+            </p>
+            <button onclick="closeModal()" class="w-full py-2 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition">
+                HO CAPITO, INTERVENGO!
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // --- 1. SNOW EFFECT (Canvas) ---
+        const canvas = document.getElementById('snowCanvas');
+        const ctx = canvas.getContext('2d');
+        let flakes = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createFlakes() {
+            const count = Math.floor(window.innerWidth / 15);
+            flakes = [];
+            for (let i = 0; i < count; i++) {
+                flakes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 3 + 1,
+                    d: Math.random() * count,
+                    opacity: Math.random() * 0.5 + 0.2,
+                    speedY: Math.random() * 1 + 0.5,
+                    speedX: Math.random() * 0.5 - 0.25
+                });
+            }
+        }
+        createFlakes();
+
+        function drawSnow() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            for (let i = 0; i < flakes.length; i++) {
+                const f = flakes[i];
+                ctx.moveTo(f.x, f.y);
+                ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
+            }
+            ctx.fill();
+            moveSnow();
+            requestAnimationFrame(drawSnow);
+        }
+
+        function moveSnow() {
+            for (let i = 0; i < flakes.length; i++) {
+                const f = flakes[i];
+                f.y += f.speedY;
+                f.x += f.speedX;
+
+                if (f.y > canvas.height) {
+                    flakes[i] = { x: Math.random() * canvas.width, y: -10, r: f.r, d: f.d, opacity: f.opacity, speedY: f.speedY, speedX: f.speedX };
+                }
+            }
+        }
+        drawSnow();
+
+        // --- 2. COUNTDOWN TIMER ---
+        const targetDate = new Date("December 22, 2026 17:00:00").getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            if (difference > 0) {
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                document.getElementById("cd-days").innerText = days < 10 ? "0" + days : days;
+                document.getElementById("cd-hours").innerText = hours < 10 ? "0" + hours : hours;
+                document.getElementById("cd-mins").innerText = minutes < 10 ? "0" + minutes : minutes;
+                document.getElementById("cd-secs").innerText = seconds < 10 ? "0" + seconds : seconds;
+            } else {
+                document.getElementById("cd-days").innerText = "00";
+                document.getElementById("cd-hours").innerText = "00";
+                document.getElementById("cd-mins").innerText = "00";
+                document.getElementById("cd-secs").innerText = "00";
+            }
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // --- 3. TAB SWITCHING ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-cyan-500', 'text-slate-950', 'shadow-lg', 'shadow-cyan-500/20');
+                btn.classList.add('text-slate-400');
+            });
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('tab-btn-' + tabId);
+            activeBtn.classList.add('bg-cyan-500', 'text-slate-950', 'shadow-lg', 'shadow-cyan-500/20');
+            activeBtn.classList.remove('text-slate-400');
+        }
+
+        // --- 4. CALCULATOR LOGIC ---
+        function recalculateTotal() {
+            let total = 20; // Base viveri
+            const noloChecked = document.getElementById('calc-nolo').checked;
+            const skipassChecked = document.getElementById('calc-skipass').checked;
+            const assChecked = document.getElementById('calc-ass').checked;
+
+            let noloVal = 0;
+            if (noloChecked) {
+                const noloRadios = document.getElementsByName('nolo-cost');
+                for (const r of noloRadios) {
+                    if (r.checked) noloVal = parseFloat(r.value);
+                }
+            }
+
+            let skipassVal = skipassChecked ? 22 : 0;
+            let assVal = assChecked ? 5 : 0; // Stima 5€ per assicurazione
+            const extraInput = document.getElementById('calc-extra');
+            let extraVal = extraInput ? Math.max(0, parseFloat(extraInput.value) || 0) : 0;
+
+            total += noloVal + skipassVal + assVal + extraVal;
+
+            document.getElementById('final-total').innerText = total.toFixed(2) + " €";
+            document.getElementById('summary-viveri').innerText = "20 €";
+            document.getElementById('summary-nolo').innerText = noloVal + " €";
+            document.getElementById('summary-skipass').innerText = skipassVal + " €";
+            document.getElementById('summary-ass').innerText = assVal + " €";
+            document.getElementById('summary-extra').innerText = extraVal.toFixed(2) + " €";
+        }
+
+        // --- 5. OBJECTIVES & LISTS DATA & LOGIC ---
+        const goalsData = [
+            "Sciare con gli sci in parallelo ⛷️",
+            "Fare una pista senza cadere ❄️",
+            "Mettersi gli scarponi senza scaraventarli 🥾",
+            "Portare e bere della buona birra 🍺",
+            "Fare l'ultima cena (Pre-pranzone di Natale) 🍕",
+            "Spolverare i compartimenti sotto i letti 🧹",
+            "Pulire casa dopo averla usata 🧼"
+        ];
+
+        const groceryData = [
+            "Pasta", "Sughi (Pomodoro e Ragù)", "Cotechino", "Lenticchie", 
+            "Frico", "Polenta", "Colazione (Merendine, Latte, Succhi)", 
+            "Merende", "Acqua (Naturale > Frizzante)", "Purè", "Verdura"
+        ];
+
+        const packingData = [
+            "Giacca da sci (o pesante)", "Pantaloni da sci", "Guanti", "Maschera o Occhiali",
+            "Intimo termico", "Pantaloni da tuta", "Magliette (termiche e non)", "Calzini pesanti / da sci",
+            "Carta d'Identità originale 🆔", "Contanti 💶", "Sacco a pelo 🛌", "Beauty case 🪥", "Giochi da tavolo 🎲"
+        ];
+
+        function renderChecklist(containerId, items, storageKey) {
+            const container = document.getElementById(containerId);
+            const savedState = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            container.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const isChecked = savedState[index] || false;
+                const div = document.createElement('div');
+                div.className = `flex items-center gap-3 p-3 rounded-xl glass-card cursor-pointer transition ${isChecked ? 'opacity-50 line-through text-slate-500' : 'text-slate-200'}`;
+                div.onclick = () => {
+                    savedState[index] = !isChecked;
+                    localStorage.setItem(storageKey, JSON.stringify(savedState));
+                    renderChecklist(containerId, items, storageKey);
+                };
+                div.innerHTML = `
+                    <div class="w-5 h-5 rounded-md border ${isChecked ? 'bg-cyan-500 border-cyan-500 text-slate-950' : 'border-slate-600'} flex items-center justify-center text-xs shrink-0 font-bold">
+                        ${isChecked ? '<i class="fa-solid fa-check"></i>' : ''}
+                    </div>
+                    <span class="text-xs md:text-sm font-medium">${item}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        renderChecklist('goals-container', goalsData, 'pianca_goals');
+        renderChecklist('grocery-list-container', groceryData, 'pianca_grocery');
+        renderChecklist('packing-list-container', packingData, 'pianca_packing');
+
+        // --- 6. BED ALLOCATION SAVE/LOAD ---
+        const bedInputs = ['bed-l2-1', 'bed-l2-2', 'bed-rom-1', 'bed-rom-2', 'bed-rom-3', 'bed-l1-1', 'bed-l1-2', 'bed-divano-1'];
+
+        function saveBeds() {
+            const data = {};
+            bedInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) data[id] = el.value;
+            });
+            localStorage.setItem('pianca_beds', JSON.stringify(data));
+        }
+
+        function loadBeds() {
+            const data = JSON.parse(localStorage.getItem('pianca_beds') || '{}');
+            bedInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && data[id]) el.value = data[id];
+            });
+        }
+        loadBeds();
+
+        // La cartina porta direttamente ai campi della zona selezionata.
+        document.querySelectorAll('[data-bed-zone]').forEach(zone => {
+            const focusZone = () => {
+                const key = zone.getAttribute('data-bed-zone');
+                const targetIds = {
+                    l1: ['bed-l1-1', 'bed-l1-2'],
+                    l2: ['bed-l2-1', 'bed-l2-2'],
+                    rom: ['bed-rom-1', 'bed-rom-2', 'bed-rom-3'],
+                    divano: ['bed-divano-1']
+                }[key] || [];
+                const target = targetIds.map(id => document.getElementById(id)).find(el => el && !el.value)
+                    || document.getElementById(targetIds[0]);
+                if (target) {
+                    target.focus();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            };
+            zone.addEventListener('click', focusZone);
+            zone.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    focusZone();
+                }
+            });
+            zone.addEventListener('mouseenter', () => zone.style.filter = 'brightness(1.25)');
+            zone.addEventListener('mouseleave', () => zone.style.filter = '');
+            zone.addEventListener('focus', () => zone.style.filter = 'brightness(1.25)');
+            zone.addEventListener('blur', () => zone.style.filter = '');
+        });
+
+        function resetBeds() {
+            bedInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            localStorage.removeItem('pianca_beds');
+        }
+
+        // --- 7. ALARM SOUND & MODAL LOGIC ---
+        function triggerRaffinAlarm() {
+            // Sound Synthesizer via Tone.js
+            try {
+                const synth = new Tone.Synth().toDestination();
+                const now = Tone.now();
+                synth.triggerAttackRelease("C5", "8n", now);
+                synth.triggerAttackRelease("G4", "8n", now + 0.2);
+                synth.triggerAttackRelease("C5", "8n", now + 0.4);
+            } catch(e) {}
+
+            const box = document.getElementById('raffin-box');
+            box.classList.add('alarm-active');
+            document.getElementById('modal-overlay').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.add('hidden');
+            document.getElementById('raffin-box').classList.remove('alarm-active');
+        }
+
+        // Start animation frame fallback
+        window.onload = function() {
+            recalculateTotal();
+        }
+    </script>
+</body>
+</html>
