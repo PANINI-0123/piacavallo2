@@ -552,10 +552,10 @@
 
                         <div class="text-center p-6 bg-slate-900/80 rounded-2xl border border-slate-800 mb-4">
                             <span class="text-xs text-slate-400 block font-mono uppercase">Importo Singolo</span>
-                            <span id="final-total" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-300 font-mono">72.00 €</span>
+                            <span id="final-total" class="text-4xl font-black font-mono" style="color: #2dd4bf; text-shadow: 0 0 20px rgba(45, 212, 191, 0.35);">72.00 €</span>
                         </div>
 
-                        <div id="budget-warning" class="budget-alert">Budget elevato in rosso</div>
+                        <div id="budget-warning" class="budget-alert">Budget elevato</div>
 
                         <ul class="space-y-2 text-xs text-slate-400 mt-4">
                             <li class="flex justify-between"><span>Viveri:</span><span id="summary-viveri" class="font-mono text-slate-200">20 €</span></li>
@@ -752,6 +752,14 @@
             activeBtn.classList.remove('text-slate-400');
         }
 
+        function getBudgetColor(total) {
+            const maxValue = 200;
+            const clamped = Math.max(0, Math.min(total, maxValue));
+            const ratio = clamped / maxValue;
+            const hue = 120 - (ratio * 120);
+            return `hsl(${hue}, 85%, 55%)`;
+        }
+
         function recalculateTotal() {
             let total = 20;
             const noloChecked = document.getElementById('calc-nolo').checked;
@@ -773,7 +781,11 @@
 
             total += noloVal + skipassVal + assVal + extraVal;
 
-            document.getElementById('final-total').innerText = total.toFixed(2) + " €";
+            const totalEl = document.getElementById('final-total');
+            totalEl.innerText = total.toFixed(2) + " €";
+            totalEl.style.color = getBudgetColor(total);
+            totalEl.style.textShadow = `0 0 20px ${getBudgetColor(total)}66`;
+
             document.getElementById('summary-viveri').innerText = "20 €";
             document.getElementById('summary-nolo').innerText = noloVal + " €";
             document.getElementById('summary-skipass').innerText = skipassVal + " €";
@@ -783,6 +795,7 @@
             const budgetWarning = document.getElementById('budget-warning');
             if (total > 150) {
                 budgetWarning.classList.add('show');
+                budgetWarning.style.color = '#fecaca';
             } else {
                 budgetWarning.classList.remove('show');
             }
