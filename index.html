@@ -136,6 +136,10 @@
             <p class="text-slate-400 text-base md:text-lg font-medium">
                 <i class="fa-solid fa-calendar-days text-cyan-400 mr-2"></i> 22 – 24 Dicembre 2026 • Piancavallo
             </p>
+            <div class="mt-4 inline-flex items-center gap-2 max-w-2xl mx-auto px-4 py-2.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-100 text-xs md:text-sm font-medium text-left">
+                <i class="fa-solid fa-school-circle-check text-amber-300"></i>
+                <span>22/12: lectio brevis, uscita anticipata da scuola, quindi possiamo salire già nel primo pomeriggio.</span>
+            </div>
 
             <div class="mt-8 grid grid-cols-4 gap-2 md:gap-4 max-w-xl mx-auto">
                 <div class="glass-card rounded-2xl p-3 md:p-4 text-center">
@@ -197,7 +201,7 @@
                             <button onclick="switchTab('programma')" class="px-4 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-bold text-sm hover:bg-cyan-400 transition">
                                 <i class="fa-solid fa-route mr-2"></i> Vedi programma
                             </button>
-                            <button onclick="switchTab('calcolatore')" class="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/60 text-slate-200 font-semibold text-sm hover:border-cyan-500/30 transition">
+                            <button onclick="switchTab('calcolatore')" class="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/60 text-slate-200 font-semibold text-sm hover:border-cyan-500/50 transition">
                                 <i class="fa-solid fa-wallet mr-2"></i> Check budget
                             </button>
                         </div>
@@ -276,6 +280,7 @@
                         </div>
                         <h3 class="text-xl font-bold mb-4">Arrivo & Setup</h3>
                         <ul class="space-y-3 text-sm text-slate-300">
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-school text-cyan-400 mt-1"></i><span><strong>22/12:</strong> Per la lectio brevis usciamo prima da scuola, quindi possiamo salire già nel primo pomeriggio.</span></li>
                             <li class="flex items-start gap-2"><i class="fa-solid fa-car text-cyan-400 mt-1"></i><span><strong>Tardo pomeriggio:</strong> Arrivo alla location.</span></li>
                             <li class="flex items-start gap-2"><i class="fa-solid fa-suitcase text-cyan-400 mt-1"></i><span><strong>45 min:</strong> Sistemazione valigie, letti & ambientazione.</span></li>
                             <li class="flex items-start gap-2"><i class="fa-solid fa-person-skiing text-cyan-400 mt-1"></i><span><strong>30 min:</strong> Noleggio attrezzatura da sci.</span></li>
@@ -296,7 +301,7 @@
                         <h3 class="text-xl font-bold mb-4">Full Ski Experience</h3>
                         <ul class="space-y-3 text-sm text-slate-300">
                             <li class="flex items-start gap-2"><i class="fa-solid fa-bell text-indigo-400 mt-1"></i><span><strong>6:00 / 6:30 / 7:00:</strong> Sveglia.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-mug-hot text-indigo-400 mt-1"></i><span><strong>1h / 1h:15m:</strong> Colazione + prime necessità <em>("Meno casino, più sci")</em>.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-mug-hot text-indigo-400 mt-1"></i><span><strong>1h / 1h:15m:</strong> Colazione + prime necessità <em>("Meno cazzate, più sci")</em>.</span></li>
                             <li class="flex items-start gap-2"><i class="fa-solid fa-mountain text-indigo-400 mt-1"></i><span><strong>Apertura Piste:</strong> Partenza immediata.</span></li>
                             <li class="flex items-start gap-2"><i class="fa-solid fa-burger text-indigo-400 mt-1"></i><span><strong>Pranzo:</strong> Direttamente sulle piste.</span></li>
                             <li class="flex items-start gap-2"><i class="fa-solid fa-flag-checkered text-indigo-400 mt-1"></i><span><strong>Chiusura Piste:</strong> Ritorno all'alloggio.</span></li>
@@ -405,8 +410,8 @@
                                 <span class="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded">2 Posti</span>
                             </div>
                             <div class="space-y-2">
-                                <input type="text" id="bed-l2-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500" />
-                                <input type="text" id="bed-l2-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500" />
+                                <input type="text" id="bed-l2-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
+                                <input type="text" id="bed-l2-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
                             </div>
                         </div>
 
@@ -416,9 +421,9 @@
                                 <span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded">3 Posti</span>
                             </div>
                             <div class="space-y-2">
-                                <input type="text" id="bed-rom-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500" />
-                                <input type="text" id="bed-rom-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500" />
-                                <input type="text" id="bed-rom-3" oninput="saveBeds()" placeholder="Persona 3" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500" />
+                                <input type="text" id="bed-rom-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
+                                <input type="text" id="bed-rom-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
+                                <input type="text" id="bed-rom-3" oninput="saveBeds()" placeholder="Persona 3" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
                             </div>
                         </div>
 
@@ -428,8 +433,8 @@
                                 <span class="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">2 Posti</span>
                             </div>
                             <div class="space-y-2">
-                                <input type="text" id="bed-l1-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500" />
-                                <input type="text" id="bed-l1-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500" />
+                                <input type="text" id="bed-l1-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
+                                <input type="text" id="bed-l1-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
                             </div>
                         </div>
 
@@ -440,7 +445,7 @@
                             </div>
                             <p class="text-[10px] text-slate-400 mb-2">*Uno o due possono spostarsi qui per stare più comodi.</p>
                             <div class="space-y-2">
-                                <input type="text" id="bed-divano-1" oninput="saveBeds()" placeholder="Persona sul divano" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500" />
+                                <input type="text" id="bed-divano-1" oninput="saveBeds()" placeholder="Persona sul divano" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
                             </div>
                         </div>
                     </div>
@@ -456,7 +461,7 @@
                         <h3 class="font-bold text-lg mb-3 text-cyan-300">Regole del Pernottamento</h3>
                         <ul class="space-y-3 text-xs text-slate-300">
                             <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50"><strong>Opzione 1 (Standard):</strong> 2 su Letto #1, 2 su Letto #2, 3 in Campo ROM.</li>
-                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50"><strong>Opzione 2 (Divano):</strong> Uno o due traslocano sul divano per allargare il Campo ROM o far respirare chi sta sotto.</li>
+                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50"><strong>Opzione 2 (Divano):</strong> Uno o due traslocano sul divano per allargare il Campo ROM.</li>
                             <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">🧹 <strong>Compito:</strong> Spolverare i compartimenti sotto i letti prima di sistemare le valigie.</li>
                         </ul>
                     </div>
@@ -493,7 +498,7 @@
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="calc-nolo" onchange="recalculateTotal()" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                                <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-slate-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
                             </label>
                         </div>
                         <div id="nolo-price-selector" class="flex gap-4 items-center text-xs">
@@ -514,7 +519,7 @@
                                 <p class="text-xs text-slate-400">Importo extra a persona, deciso da te</p>
                             </div>
                             <div class="flex items-center gap-2">
-                                <input type="number" id="calc-extra" min="0" step="0.50" value="0" oninput="recalculateTotal()" aria-label="Spese aggiuntive in euro" class="w-24 bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-cyan-500" />
+                                <input type="number" id="calc-extra" min="0" step="0.50" value="0" oninput="recalculateTotal()" aria-label="Spese aggiuntive in euro" class="w-24 bg-slate-900/80 border border-slate-700 rounded-lg px-2 py-1.5 text-sm text-slate-100 focus:border-cyan-500 focus:outline-none" />
                                 <span class="text-sm text-slate-400">€</span>
                             </div>
                         </div>
@@ -528,7 +533,7 @@
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="calc-skipass" onchange="recalculateTotal()" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                                <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-slate-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
                             </label>
                         </div>
 
@@ -539,7 +544,7 @@
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="calc-ass" onchange="recalculateTotal()" class="sr-only peer">
-                                <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
+                                <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-slate-300 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
                             </label>
                         </div>
                     </div>
@@ -593,7 +598,7 @@
                             <p class="text-xs text-slate-300">Molestare Raffin e picchiarlo se svapa nei luoghi non adatti <em>(+ Alotta incluso)</em>.</p>
                         </div>
                     </div>
-                    <button onclick="triggerRaffinAlarm()" class="px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-xs rounded-xl transition">
+                    <button onclick="triggerRaffinAlarm()" class="px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-xs rounded-xl transition shadow-lg shadow-red-900/40">
                         <i class="fa-solid fa-bullhorn"></i> SUONA ALLARME SVAPO
                     </button>
                 </div>
