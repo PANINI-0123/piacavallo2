@@ -117,6 +117,7 @@
             display: block;
         }
     </style>
+<style>body:not(.auth-ok) > *:not(#authGate):not(#privacyModal):not(script){display:none!important}</style>
 </head>
 <body class="relative min-h-screen text-slate-100">
     <canvas id="snowCanvas"></canvas>
@@ -185,6 +186,9 @@
             </button>
             <button onclick="switchTab('storia')" id="tab-btn-storia" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white">
                 <i class="fa-solid fa-scroll"></i> Cronologia
+            </button>
+            <button onclick="switchTab('chat')" id="tab-btn-chat" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-comments"></i> Chat <span id="chat-dot" class="hidden inline-block w-2 h-2 rounded-full bg-rose-400"></span>
             </button>
             <button id="user-btn" onclick="auth.signOut()" class="hidden px-4 py-2.5 rounded-xl font-semibold text-sm transition-all items-center gap-2 text-rose-300 hover:text-white border border-rose-500/30"></button>
         </nav>
@@ -644,6 +648,18 @@
             </div>
         </section>
 
+        <section id="tab-chat" class="tab-content hidden space-y-4">
+            <div>
+                <h2 class="text-2xl font-bold flex items-center gap-2"><i class="fa-solid fa-comments text-cyan-400"></i> Chat</h2>
+                <p class="text-xs text-slate-400">Solo testo. I messaggi si cancellano dopo 30 giorni.</p>
+            </div>
+            <div id="chat-list" class="glass-panel rounded-2xl p-3 h-[55vh] overflow-y-auto space-y-2"></div>
+            <div class="flex gap-2">
+                <input id="chat-input" type="text" maxlength="500" autocomplete="off" placeholder="Scrivi un messaggio..." class="flex-1 bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500">
+                <button id="chat-send" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm rounded-xl transition"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </section>
+
         <section id="tab-foto" class="tab-content hidden space-y-6">
             <div class="flex flex-wrap justify-between items-center gap-3">
                 <div>
@@ -678,10 +694,10 @@
         </footer>
     </div>
 
-    <div id="authGate" class="hidden fixed inset-0 flex items-center justify-center p-4 bg-slate-950" style="z-index:60">
+    <div id="authGate" class="fixed inset-0 flex items-center justify-center p-4 bg-slate-950" style="z-index:60">
         <div class="glass-panel rounded-2xl p-6 max-w-sm w-full space-y-3">
             <h2 class="text-xl font-black text-cyan-300 text-center">❄️ PIANCASBALLO</h2>
-            <div id="authForm" class="space-y-3">
+            <div id="authForm" class="hidden space-y-3">
                 <p class="text-xs text-slate-400 text-center">Area riservata agli amici del gruppo</p>
                 <input id="nameInput" type="text" placeholder="Il tuo nome" class="hidden w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500">
                 <input id="emailInput" type="email" placeholder="Email" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500">
@@ -695,11 +711,11 @@
                 <p id="authMessage" class="text-xs text-center min-h-[1rem]"></p>
                 <button id="authToggle" class="w-full text-xs text-slate-400 underline">Non hai un account? Registrati</button>
             </div>
-            <div id="verifyBox" class="hidden space-y-3 text-center">
-                <p id="verifyText" class="text-sm text-slate-200"></p>
+            <div id="verifyBox" class="space-y-3 text-center">
+                <p id="verifyText" class="text-sm text-slate-200">Caricamento...</p>
                 <button id="verifyDone" class="hidden w-full py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm rounded-xl transition">Ho verificato, entra</button>
                 <button id="verifyResend" class="hidden w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold text-sm rounded-xl transition">Rinvia l'email di verifica</button>
-                <button onclick="auth.signOut()" class="w-full text-xs text-slate-400 underline">Esci</button>
+                <button id="verifyOut" onclick="auth.signOut()" class="hidden w-full text-xs text-slate-400 underline">Esci</button>
             </div>
         </div>
     </div>
@@ -707,19 +723,19 @@
     <div id="privacyModal" class="hidden fixed inset-0 bg-slate-950/95 overflow-y-auto p-4" style="z-index:70">
         <div class="glass-panel rounded-2xl p-6 max-w-2xl mx-auto my-6 space-y-3 text-xs md:text-sm text-slate-300">
             <h2 class="text-xl font-black text-cyan-300">Informativa sulla privacy</h2>
-            <p class="text-slate-500">Ai sensi degli artt. 13-14 del Regolamento UE 2016/679 (GDPR). Ultimo aggiornamento: 12 novembre 2026.</p>
+            <p class="text-slate-500">Ai sensi degli artt. 13-14 del Regolamento UE 2016/679 (GDPR). Ultimo aggiornamento: 13 novembre 2026.</p>
             <h3 class="font-bold text-slate-100">1. Titolare del trattamento</h3>
-            <p>[INSERISCI NOME E COGNOME], organizzatore del viaggio “Piancasballo Season #2”. Per qualsiasi richiesta puoi contattarlo direttamente attraverso i canali abituali del gruppo.</p>
+            <p>Matteo Alotta, organizzatore del viaggio “Piancasballo Season #2”. Per qualsiasi richiesta puoi contattarlo direttamente attraverso i canali abituali del gruppo.</p>
             <h3 class="font-bold text-slate-100">2. Quali dati trattiamo</h3>
-            <p>Nome (scelto da te o fornito da Google), indirizzo email, password (gestita da Firebase Authentication: il titolare non può vederla), foto che decidi di caricare, azioni compiute sul sito (spunte alle liste, nomi nei posti letto) con nome e orario, e dati tecnici di connessione (come l'indirizzo IP) trattati dai fornitori del servizio.</p>
+            <p>Nome (scelto da te o fornito da Google), indirizzo email, password (gestita da Firebase Authentication: il titolare non può vederla), foto che decidi di caricare, azioni compiute sul sito (spunte alle liste, nomi nei posti letto) con nome e orario, messaggi scritti nella chat, e dati tecnici di connessione (come l'indirizzo IP) trattati dai fornitori del servizio.</p>
             <h3 class="font-bold text-slate-100">3. Finalità e base giuridica</h3>
             <p>I dati servono solo a consentire l'accesso riservato al sito e a organizzare il viaggio insieme (liste condivise, posti letto, cronologia delle modifiche, galleria foto). La base giuridica è il tuo consenso, che dai registrandoti volontariamente e che puoi revocare in ogni momento.</p>
             <h3 class="font-bold text-slate-100">4. Chi può vedere i dati</h3>
-            <p>Solo i partecipanti autorizzati dal titolare vedono il tuo nome, le tue foto e le tue modifiche. La tua email non viene mostrata agli altri partecipanti. I dati non sono pubblici e non vengono venduti né usati per pubblicità. Carica solo foto che puoi condividere con il gruppo e non pubblicare foto di altre persone senza il loro consenso.</p>
+            <p>Solo i partecipanti autorizzati dal titolare vedono il tuo nome, le tue foto, i tuoi messaggi e le tue modifiche. La tua email non viene mostrata agli altri partecipanti. I dati non sono pubblici e non vengono venduti né usati per pubblicità. Carica solo foto che puoi condividere con il gruppo e non pubblicare foto di altre persone senza il loro consenso.</p>
             <h3 class="font-bold text-slate-100">5. Fornitori e trasferimenti</h3>
             <p>I dati sono conservati su Google Firebase (Authentication e Firestore), forniti da Google. Il sito è ospitato su GitHub Pages e carica font e librerie da servizi esterni (Google Fonts, cdnjs, Tailwind CSS, Font Awesome), che possono ricevere il tuo indirizzo IP. Alcuni di questi fornitori hanno sede fuori dall'Unione Europea: il trasferimento avviene con le garanzie previste dalla normativa (decisioni di adeguatezza o clausole contrattuali standard).</p>
             <h3 class="font-bold text-slate-100">6. Conservazione</h3>
-            <p>I dati sono conservati per il tempo necessario a organizzare e vivere il viaggio e a condividere le foto; poi account e contenuti vengono cancellati. Puoi chiedere la cancellazione in qualsiasi momento.</p>
+            <p>I dati sono conservati per il tempo necessario a organizzare e vivere il viaggio e a condividere le foto; poi account e contenuti vengono cancellati. I messaggi della chat vengono eliminati automaticamente dopo 30 giorni. Puoi chiedere la cancellazione in qualsiasi momento.</p>
             <h3 class="font-bold text-slate-100">7. Archiviazione nel browser</h3>
             <p>Il sito usa l'archiviazione del browser (localStorage e IndexedDB) solo per funzioni tecniche, come mantenere l'accesso e ricordare le tue scelte. Non usa strumenti di analisi o profilazione.</p>
             <h3 class="font-bold text-slate-100">8. I tuoi diritti</h3>
@@ -1061,7 +1077,9 @@ const setUserBtn = () => { $('user-btn').innerHTML = '<i class="fa-solid fa-righ
 function openPrivacy() { $('privacyModal').classList.remove('hidden'); }
 function closePrivacy() { $('privacyModal').classList.add('hidden'); }
 function showGate(state, text) {
+  document.body.classList.remove('auth-ok');
   $('authGate').classList.remove('hidden');
+  $('verifyOut').classList.toggle('hidden', state === 'loading');
   $('authForm').classList.toggle('hidden', state !== 'form');
   $('verifyBox').classList.toggle('hidden', state === 'form');
   $('verifyDone').classList.toggle('hidden', state !== 'verify');
@@ -1110,8 +1128,7 @@ auth.onAuthStateChanged(u => {
   $('user-btn').classList.add('hidden'); $('user-btn').classList.remove('flex');
   if (!u) { S = {goals:{}, grocery:{}, beds:{}}; showGate('form'); return; }
   if (!u.emailVerified) { showGate('verify', 'Ti abbiamo mandato un\'email di verifica a ' + u.email + '. Clicca il link nel messaggio, poi premi il pulsante qui sotto.'); return; }
-  $('authGate').classList.add('hidden');
-  $('user-btn').classList.remove('hidden'); $('user-btn').classList.add('flex');
+  showGate('loading', 'Caricamento...');
   setUserBtn(); startListeners();
 });
 
@@ -1239,10 +1256,70 @@ async function openPhoto(id, t) {
 }
 function closeLightbox() { const lb = $('lightbox'); lb.classList.add('hidden'); lb.classList.remove('flex'); }
 
+/* ---------- CHAT ---------- */
+let chatFirst = true;
+function sendChat() {
+  const u = auth.currentUser, i = $('chat-input'), t = i.value.trim();
+  if (!u || !t) return;
+  i.value = '';
+  db.collection('messages').add({
+    uid: u.uid, name: who(), text: t.slice(0, 500),
+    ts: firebase.firestore.FieldValue.serverTimestamp(),
+    expireAt: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 30 * 864e5))
+  }).catch(e => { console.error(e); i.value = t; });
+}
+$('chat-send').onclick = sendChat;
+$('chat-input').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
+function renderChat(s) {
+  const c = $('chat-list'), u = auth.currentUser;
+  const nearEnd = c.scrollHeight - c.scrollTop - c.clientHeight < 80;
+  if (!chatFirst && $('tab-chat').classList.contains('hidden') && s.docChanges().some(ch => ch.type === 'added' && ch.doc.data().uid !== u.uid)) $('chat-dot').classList.remove('hidden');
+  const docs = []; s.forEach(d => docs.push(d)); docs.reverse();
+  c.innerHTML = '';
+  let lastMine = false, n = 0;
+  docs.forEach(doc => {
+    const d = doc.data({serverTimestamps: 'estimate'}), me = !!u && d.uid === u.uid;
+    if (d.expireAt && d.expireAt.toDate() < new Date()) return;
+    n++; lastMine = me;
+    const t = d.ts ? d.ts.toDate().toLocaleString('it-IT', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) : '';
+    const w = document.createElement('div'), b = document.createElement('div'), h = document.createElement('div'), x = document.createElement('div'), m = document.createElement('div');
+    w.className = 'flex ' + (me ? 'justify-end' : 'justify-start');
+    b.className = 'max-w-[80%] rounded-2xl px-3 py-2 text-sm break-words ' + (me ? 'bg-cyan-600/40 text-slate-50' : 'bg-slate-800/80 text-slate-100');
+    h.className = 'text-[10px] font-bold text-cyan-300'; h.textContent = me ? 'Tu' : d.name;
+    x.className = 'whitespace-pre-wrap'; x.textContent = d.text;
+    m.className = 'text-[10px] text-slate-400 mt-0.5'; m.textContent = t;
+    if (me) {
+      const del = document.createElement('button');
+      del.textContent = ' · elimina'; del.className = 'hover:text-rose-300';
+      del.onclick = () => doc.ref.delete().catch(console.error);
+      m.appendChild(del);
+    }
+    b.append(h, x, m); w.appendChild(b); c.appendChild(w);
+  });
+  if (!n) c.innerHTML = '<p class="text-xs text-slate-400 text-center">Nessun messaggio. Scrivi il primo!</p>';
+  if (nearEnd || chatFirst || lastMine) c.scrollTop = c.scrollHeight;
+  chatFirst = false;
+}
+async function cleanupChat() {
+  try {
+    const old = await db.collection('messages').where('expireAt', '<', firebase.firestore.Timestamp.now()).limit(100).get();
+    if (old.empty) return;
+    const b = db.batch(); old.forEach(d => b.delete(d.ref)); await b.commit();
+  } catch (e) { console.error(e); }
+}
+const _st = window.switchTab;
+window.switchTab = n => {
+  _st(n);
+  if (n === 'chat') { $('chat-dot').classList.add('hidden'); const c = $('chat-list'); c.scrollTop = c.scrollHeight; }
+};
+
 /* ---------- ASCOLTO DATI ---------- */
 function startListeners() {
   const err = e => console.error(e);
+  chatFirst = true; cleanupChat();
   unsubs.push(STATE.onSnapshot(s => {
+    $('authGate').classList.add('hidden'); document.body.classList.add('auth-ok');
+    $('user-btn').classList.remove('hidden'); $('user-btn').classList.add('flex');
     const d = s.data() || {};
     S = {goals: d.goals || {}, grocery: d.grocery || {}, beds: d.beds || {}};
     renderShared('goals-container', goalsData, 'goals');
@@ -1253,6 +1330,7 @@ function startListeners() {
     else console.error(e);
   }));
   unsubs.push(db.collection('history').orderBy('ts', 'desc').limit(100).onSnapshot(renderHistory, err));
+  unsubs.push(db.collection('messages').orderBy('ts', 'desc').limit(150).onSnapshot(renderChat, err));
   unsubs.push(db.collection('thumbs').orderBy('ts', 'desc').limit(60).onSnapshot(renderPhotos, err));
 }
 </script>
