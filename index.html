@@ -117,9 +117,32 @@
             display: block;
         }
     </style>
+<style>
+:root{--hype:0}
+header.glass-panel{box-shadow:0 0 calc(var(--hype)*60px) rgba(236,72,153,calc(var(--hype)*.45))}
+#cd-wrap>div{transform:scale(calc(1 + var(--hype)*.08))}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes glowb{0%,100%{box-shadow:0 0 18px rgba(34,211,238,.25)}50%{box-shadow:0 0 44px rgba(236,72,153,.55)}}
+.hot #cd-secs{animation:pulse2 1s infinite}
+.trip-card{animation:glowb 3s ease-in-out infinite}
+#trip-slot li{font-size:1rem}
+#plan .slot{cursor:pointer}
+#plan .slot:hover rect{stroke-width:3}
+</style>
 <style>body:not(.auth-ok) > *:not(#authGate):not(#privacyModal):not(script){display:none!important}</style>
 </head>
 <body class="relative min-h-screen text-slate-100">
+<script>
+(function(){
+  var q=new URLSearchParams(location.search).get('data'), t=q?new Date(q).getTime():NaN, off=isNaN(t)?0:t-Date.now();
+  window.nowMs=function(){return Date.now()+off};
+  window.DEPART=new Date('2026-12-22T15:00:00').getTime();
+  var d=(DEPART-nowMs())/864e5, r=document.documentElement;
+  window.HYPE=Math.max(0,Math.min(1,1-d/40));
+  r.style.setProperty('--hype',HYPE);
+  if(HYPE>0.6) r.classList.add('hot');
+})();
+</script>
     <canvas id="snowCanvas"></canvas>
 
     <div class="relative z-10 max-w-6xl mx-auto px-4 py-8 space-y-10">
@@ -142,7 +165,7 @@
                 <span>22/12: lectio brevis, uscita anticipata da scuola, quindi possiamo salire già nel primo pomeriggio.</span>
             </div>
 
-            <div class="mt-8 grid grid-cols-4 gap-2 md:gap-4 max-w-xl mx-auto">
+            <div id="cd-wrap" class="mt-8 grid grid-cols-4 gap-2 md:gap-4 max-w-xl mx-auto">
                 <div class="glass-card rounded-2xl p-3 md:p-4 text-center">
                     <span id="cd-days" class="block text-2xl md:text-4xl font-extrabold text-cyan-400 font-mono">00</span>
                     <span class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider">Giorni</span>
@@ -194,82 +217,50 @@
         </nav>
 
         <section id="tab-home" class="tab-content block space-y-6">
-            <div class="grid lg:grid-cols-[1.4fr_0.9fr] gap-6">
+            <div id="home-pre" class="grid lg:grid-cols-[1.3fr_1fr] gap-6">
                 <div class="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden border border-cyan-500/20">
                     <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-pink-500/10"></div>
-                    <div class="relative z-10">
-                        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold uppercase tracking-[0.2em]">
-                            <i class="fa-solid fa-snowflake"></i> Pre-flight briefing
-                        </span>
-                        <h2 class="mt-5 text-3xl md:text-5xl font-black leading-tight text-white">
-                            Preparati a una<br>
-                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-300">vacanza da campioni.</span>
-                        </h2>
-                        <p class="mt-4 text-sm md:text-base text-slate-300 max-w-xl">
-                            Programma, sistemazione, budget e lista spesa in un unico dashboard. Qui si organizza il trip perfetto tra piste, birra, valigie e un po’ di caos felice.
-                        </p>
-                        <div class="mt-6 flex flex-wrap gap-3">
-                            <button onclick="switchTab('programma')" class="px-4 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-bold text-sm hover:bg-cyan-400 transition">
-                                <i class="fa-solid fa-route mr-2"></i> Vedi programma
-                            </button>
-                            <button onclick="switchTab('calcolatore')" class="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/60 text-slate-200 font-semibold text-sm hover:border-cyan-500/50 transition">
-                                <i class="fa-solid fa-wallet mr-2"></i> Check budget
-                            </button>
+                    <div class="relative z-10 space-y-4">
+                        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold uppercase tracking-[0.2em]"><i class="fa-solid fa-snowflake"></i> Piancasballo Season #2</span>
+                        <h2 id="home-title" class="text-4xl md:text-6xl font-black leading-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-pink-300"></h2>
+                        <p id="home-msg" class="text-sm md:text-base text-slate-300 max-w-xl"></p>
+                        <div>
+                            <div class="flex justify-between text-[10px] uppercase tracking-widest text-slate-400"><span>Livello di hype</span><span id="hype-pct"></span></div>
+                            <div class="h-2 rounded-full bg-slate-800 overflow-hidden mt-1"><div id="hype-bar" class="h-full rounded-full bg-gradient-to-r from-cyan-400 to-pink-500" style="width:0%"></div></div>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="switchTab('programma')" class="px-4 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-bold text-sm hover:bg-cyan-400 transition"><i class="fa-solid fa-route mr-2"></i> Vedi programma</button>
+                            <button onclick="switchTab('liste')" class="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/60 text-slate-200 font-semibold text-sm hover:border-cyan-500/50 transition"><i class="fa-solid fa-cart-shopping mr-2"></i> Lista spesa</button>
                         </div>
                     </div>
                 </div>
-
-                <div class="space-y-4">
-                    <div class="glass-panel rounded-2xl p-5 border border-indigo-500/30">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs uppercase tracking-[0.2em] text-slate-400">Gruppo</span>
-                            <span class="text-emerald-400 text-xs font-semibold"><i class="fa-solid fa-circle-check mr-1"></i> 7 persone</span>
-                        </div>
-                        <div class="mt-4 text-3xl font-black text-indigo-300 font-mono">Piancavallo</div>
-                        <p class="mt-2 text-xs text-slate-400">3 giorni • 2 notti • 1 missione: divertirsi senza scomporsi.</p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="glass-card rounded-2xl p-4 border border-cyan-500/20">
-                            <div class="text-[10px] uppercase tracking-[0.2em] text-slate-400">Piste</div>
-                            <div class="mt-2 text-2xl font-black text-cyan-300 font-mono">Full</div>
-                            <div class="text-[10px] text-slate-400">apertura immediata</div>
-                        </div>
-                        <div class="glass-card rounded-2xl p-4 border border-pink-500/20">
-                            <div class="text-[10px] uppercase tracking-[0.2em] text-slate-400">Rientro</div>
-                            <div class="mt-2 text-2xl font-black text-pink-300 font-mono">24</div>
-                            <div class="text-[10px] text-slate-400">dopo vigilia</div>
-                        </div>
-                    </div>
+                <div class="glass-panel rounded-3xl p-6 border border-indigo-500/30">
+                    <h3 class="font-bold text-indigo-300 mb-2">Il quadro in breve</h3>
+                    <div id="facts"></div>
                 </div>
             </div>
-
+            <div id="home-trip" class="hidden space-y-4">
+                <div class="text-center">
+                    <span id="trip-day" class="text-xs font-bold uppercase tracking-[0.3em] text-pink-300"></span>
+                    <h2 id="trip-title" class="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-pink-300 mt-1"></h2>
+                    <p id="trip-msg" class="text-sm md:text-base text-slate-300 mt-2"></p>
+                </div>
+                <div id="trip-slot" class="max-w-xl mx-auto"></div>
+            </div>
             <div class="grid md:grid-cols-3 gap-6">
-                <div class="glass-panel rounded-2xl p-5 border border-cyan-500/20">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-300"><i class="fa-solid fa-calendar-check"></i></div>
-                        <h3 class="font-bold text-cyan-300">Programma</h3>
-                    </div>
-                    <p class="text-sm text-slate-300">Timeline dettagliata per ogni giornata: arrivo, sci day, alba, ritorno a casa.</p>
-                    <button onclick="switchTab('programma')" class="mt-4 text-xs font-semibold text-cyan-300 hover:text-cyan-200">Apri timeline →</button>
-                </div>
-
                 <div class="glass-panel rounded-2xl p-5 border border-indigo-500/20">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-300"><i class="fa-solid fa-bed"></i></div>
-                        <h3 class="font-bold text-indigo-300">Pernottamento</h3>
-                    </div>
-                    <p class="text-sm text-slate-300">Assegnazione letti, divano e campo ROM con salvataggio automatico nel browser.</p>
-                    <button onclick="switchTab('mappa')" class="mt-4 text-xs font-semibold text-indigo-300 hover:text-indigo-200">Gestisci letti →</button>
+                    <h3 class="font-bold text-indigo-300 mb-2"><i class="fa-solid fa-person-skiing mr-2"></i>Piste</h3>
+                    <p class="text-sm text-slate-300">Si scia tutto il 23 e la mattina del 24. Impianti indicativamente dalle 9:00 alle 16:00, da confermare.</p>
+                    <p class="text-sm text-slate-300 mt-2"><strong class="text-cyan-300">Colalto:</strong> la pista nuova vicino a casa di Boz. Si risale e si scende in fretta da e per casa, ma è un po' lontana dal resto delle piste.</p>
                 </div>
-
+                <div class="glass-panel rounded-2xl p-5 border border-cyan-500/20">
+                    <h3 class="font-bold text-cyan-300 mb-2"><i class="fa-solid fa-satellite-dish mr-2"></i>Radar del gruppo</h3>
+                    <button onclick="switchTab('liste')" class="w-full flex justify-between gap-3 text-left py-1.5 border-b border-slate-800 last:border-0"><span class="text-xs text-slate-400 shrink-0">Spesa</span><span id="live-spesa" class="text-xs text-slate-200 truncate min-w-0">-</span></button><button onclick="switchTab('obiettivi')" class="w-full flex justify-between gap-3 text-left py-1.5 border-b border-slate-800 last:border-0"><span class="text-xs text-slate-400 shrink-0">Obiettivi</span><span id="live-obj" class="text-xs text-slate-200 truncate min-w-0">-</span></button><button onclick="switchTab('mappa')" class="w-full flex justify-between gap-3 text-left py-1.5 border-b border-slate-800 last:border-0"><span class="text-xs text-slate-400 shrink-0">Posti letto</span><span id="live-letti" class="text-xs text-slate-200 truncate min-w-0">-</span></button><button onclick="switchTab('storia')" class="w-full flex justify-between gap-3 text-left py-1.5 border-b border-slate-800 last:border-0"><span class="text-xs text-slate-400 shrink-0">Ultima modifica</span><span id="live-hist" class="text-xs text-slate-200 truncate min-w-0">-</span></button><button onclick="switchTab('chat')" class="w-full flex justify-between gap-3 text-left py-1.5 border-b border-slate-800 last:border-0"><span class="text-xs text-slate-400 shrink-0">Ultimo messaggio</span><span id="live-chat" class="text-xs text-slate-200 truncate min-w-0">-</span></button>
+                </div>
                 <div class="glass-panel rounded-2xl p-5 border border-pink-500/20">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-300"><i class="fa-solid fa-sack-dollar"></i></div>
-                        <h3 class="font-bold text-pink-300">Budget</h3>
-                    </div>
-                    <p class="text-sm text-slate-300">Controlla spese vive e parti preparato: se superi 150€ ti avviseremo subito.</p>
-                    <button onclick="switchTab('calcolatore')" class="mt-4 text-xs font-semibold text-pink-300 hover:text-pink-200">Calcola spesa →</button>
+                    <h3 class="font-bold text-pink-300 mb-2"><i class="fa-solid fa-sack-dollar mr-2"></i>Budget</h3>
+                    <p class="text-sm text-slate-300">Stima base di 92–97 € a testa: viveri 20 €, noleggio 50–55 €, skipass 22 €. L'assicurazione (6 €) e gli extra si sommano.</p>
+                    <button onclick="switchTab('calcolatore')" class="mt-3 text-xs font-semibold text-pink-300 hover:text-pink-200">Apri il calcolatore →</button>
                 </div>
             </div>
         </section>
@@ -283,7 +274,7 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-6">
-                <div class="glass-panel rounded-2xl p-6 border-t-4 border-t-cyan-500 relative flex flex-col justify-between">
+                <div id="prog-d1" class="glass-panel rounded-2xl p-6 border-t-4 border-t-cyan-500 relative flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-4">
                             <span class="px-3 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-lg text-xs font-bold">22 DICEMBRE</span>
@@ -303,7 +294,7 @@
                     </div>
                 </div>
 
-                <div class="glass-panel rounded-2xl p-6 border-t-4 border-t-indigo-500 relative flex flex-col justify-between">
+                <div id="prog-d2" class="glass-panel rounded-2xl p-6 border-t-4 border-t-indigo-500 relative flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-4">
                             <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 rounded-lg text-xs font-bold">23 DICEMBRE</span>
@@ -313,9 +304,9 @@
                         <ul class="space-y-3 text-sm text-slate-300">
                             <li class="flex items-start gap-2"><i class="fa-solid fa-bell text-indigo-400 mt-1"></i><span><strong>6:00 / 6:30 / 7:00:</strong> Sveglia.</span></li>
                             <li class="flex items-start gap-2"><i class="fa-solid fa-mug-hot text-indigo-400 mt-1"></i><span><strong>1h / 1h:15m:</strong> Colazione + prime necessità <em>("Meno cazzate, più sci")</em>.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-mountain text-indigo-400 mt-1"></i><span><strong>Apertura Piste:</strong> Partenza immediata.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-mountain text-indigo-400 mt-1"></i><span><strong>Apertura piste (circa 9:00):</strong> Partenza immediata.</span></li>
                             <li class="flex items-start gap-2"><i class="fa-solid fa-burger text-indigo-400 mt-1"></i><span><strong>Pranzo:</strong> Direttamente sulle piste.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-flag-checkered text-indigo-400 mt-1"></i><span><strong>Chiusura Piste:</strong> Ritorno all'alloggio.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-flag-checkered text-indigo-400 mt-1"></i><span><strong>Chiusura piste (circa 16:00):</strong> Ritorno all'alloggio.</span></li>
                         </ul>
                     </div>
                     <div class="mt-6 pt-4 border-t border-slate-800 text-center">
@@ -323,7 +314,7 @@
                     </div>
                 </div>
 
-                <div class="glass-panel rounded-2xl p-6 border-t-4 border-t-pink-500 relative flex flex-col justify-between">
+                <div id="prog-d3" class="glass-panel rounded-2xl p-6 border-t-4 border-t-pink-500 relative flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-4">
                             <span class="px-3 py-1 bg-pink-500/10 text-pink-400 border border-pink-500/30 rounded-lg text-xs font-bold">24 DICEMBRE</span>
@@ -347,139 +338,36 @@
         <section id="tab-mappa" class="tab-content hidden space-y-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold flex items-center gap-2">
-                        <i class="fa-solid fa-map-location-dot text-cyan-400"></i> Planimetria & Assegnazione Letto
-                    </h2>
-                    <p class="text-xs text-slate-400">Fai clic sui letti o digita i nomi dei 7 componenti per organizzare il pernottamento.</p>
+                    <h2 class="text-2xl font-bold flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-cyan-400"></i> Planimetria & Assegnazione Letto</h2>
+                    <p class="text-xs text-slate-400">Tocca un posto sulla piantina o scrivi i nomi qui sotto: lo vedono tutti in tempo reale.</p>
                 </div>
-                <button onclick="resetBeds()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg transition text-slate-300">
-                    <i class="fa-solid fa-rotate-left mr-1"></i> Reset Assegnazioni
-                </button>
+                <button onclick="resetBeds()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg transition text-slate-300"><i class="fa-solid fa-rotate-left mr-1"></i> Reset Assegnazioni</button>
             </div>
-
-            <div class="grid lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 glass-panel rounded-2xl p-6 relative min-h-[380px] border border-slate-700 flex flex-col justify-between">
-                    <div class="absolute top-3 left-3 text-xs font-mono text-slate-500 uppercase flex items-center gap-1">
-                        <i class="fa-solid fa-border-all"></i> Piantina Alloggio #1 & #2
-                    </div>
-
-                    <div class="my-6 rounded-xl border border-slate-700 bg-slate-950/60 p-3">
-                        <div class="flex items-center justify-between gap-3 mb-2">
-                            <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Cartina dei possibili posti letto</span>
-                            <span class="text-[10px] text-slate-500">Seleziona una zona per assegnare i posti</span>
-                        </div>
-                        <svg viewBox="0 0 640 330" role="img" aria-label="Planimetria interattiva con finestra, Letto 2, Campo ROM, Letto 1, divano e mobile" class="w-full h-auto">
-                            <defs>
-                                <linearGradient id="roomFill" x1="0" y1="0" x2="1" y2="1">
-                                    <stop offset="0%" stop-color="#0f2537"/>
-                                    <stop offset="100%" stop-color="#111827"/>
-                                </linearGradient>
-                            </defs>
-                            <path d="M70 40 H570 V285 H70 Z" fill="url(#roomFill)" stroke="#64748b" stroke-width="3" stroke-linejoin="round"/>
-                            <path d="M70 90 H42 V230 H70" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="5 5"/>
-                            <text x="25" y="160" fill="#7dd3fc" font-size="13" text-anchor="middle" transform="rotate(-90 25 160)">FINESTRA</text>
-                            <g class="floor-zone" data-bed-zone="l2" role="button" tabindex="0" aria-label="Assegna persone al Letto 2" style="cursor:pointer">
-                                <rect x="95" y="55" width="220" height="70" rx="10" fill="#312e81" fill-opacity=".65" stroke="#818cf8" stroke-width="2"/>
-                                <rect x="106" y="65" width="42" height="49" rx="5" fill="#a5b4fc" fill-opacity=".25" stroke="#a5b4fc"/>
-                                <rect x="154" y="65" width="42" height="49" rx="5" fill="#a5b4fc" fill-opacity=".25" stroke="#a5b4fc"/>
-                                <text x="235" y="84" fill="#c7d2fe" font-size="16" font-weight="700" text-anchor="middle">LETTO #2</text>
-                                <text x="235" y="104" fill="#c7d2fe" font-size="12" text-anchor="middle">2 posti</text>
-                            </g>
-                            <g class="floor-zone" data-bed-zone="rom" role="button" tabindex="0" aria-label="Assegna persone al Campo ROM" style="cursor:pointer">
-                                <rect x="335" y="55" width="210" height="70" rx="10" fill="#78350f" fill-opacity=".55" stroke="#fbbf24" stroke-width="2"/>
-                                <path d="M365 108 L390 68 L415 108 Z" fill="#fbbf24" fill-opacity=".2" stroke="#fcd34d" stroke-width="2"/>
-                                <text x="472" y="84" fill="#fde68a" font-size="16" font-weight="700" text-anchor="middle">CAMPO ROM</text>
-                                <text x="472" y="104" fill="#fde68a" font-size="12" text-anchor="middle">3 posti</text>
-                            </g>
-                            <g class="floor-zone" data-bed-zone="l1" role="button" tabindex="0" aria-label="Assegna persone al Letto 1" style="cursor:pointer">
-                                <rect x="95" y="145" width="220" height="70" rx="10" fill="#164e63" fill-opacity=".7" stroke="#22d3ee" stroke-width="2"/>
-                                <rect x="106" y="155" width="42" height="49" rx="5" fill="#67e8f9" fill-opacity=".22" stroke="#67e8f9"/>
-                                <rect x="154" y="155" width="42" height="49" rx="5" fill="#67e8f9" fill-opacity=".22" stroke="#67e8f9"/>
-                                <text x="235" y="174" fill="#a5f3fc" font-size="16" font-weight="700" text-anchor="middle">LETTO #1</text>
-                                <text x="235" y="194" fill="#a5f3fc" font-size="12" text-anchor="middle">2 posti</text>
-                            </g>
-                            <g class="floor-zone" data-bed-zone="divano" role="button" tabindex="0" aria-label="Assegna persona al divano" style="cursor:pointer">
-                                <rect x="335" y="145" width="210" height="70" rx="10" fill="#831843" fill-opacity=".5" stroke="#f472b6" stroke-width="2"/>
-                                <rect x="355" y="163" width="56" height="32" rx="7" fill="#f9a8d4" fill-opacity=".2" stroke="#f9a8d4" stroke-width="2"/>
-                                <text x="472" y="174" fill="#fbcfe8" font-size="16" font-weight="700" text-anchor="middle">DIVANO</text>
-                                <text x="472" y="194" fill="#fbcfe8" font-size="12" text-anchor="middle">1-2 posti</text>
-                            </g>
-                            <rect x="225" y="235" width="170" height="30" rx="6" fill="#334155" stroke="#64748b"/>
-                            <text x="310" y="254" fill="#cbd5e1" font-size="12" text-anchor="middle">MOBILE / ZONA VALIGIE</text>
-                            <text x="320" y="310" fill="#64748b" font-size="11" text-anchor="middle">Schema indicativo, non in scala</text>
-                        </svg>
-                    </div>
-
-                    <div class="grid grid-cols-12 gap-3 my-6">
-                        <div class="col-span-12 flex items-center justify-center p-2 border border-dashed border-cyan-500/40 rounded-xl bg-cyan-500/5 text-cyan-400 text-xs font-mono">
-                            🪟 FINESTRA / LUMINOSITÀ
-                        </div>
-
-                        <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-indigo-500/30">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-sm text-indigo-300">LETTO #2</span>
-                                <span class="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded">2 Posti</span>
-                            </div>
-                            <div class="space-y-2">
-                                <input type="text" id="bed-l2-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
-                                <input type="text" id="bed-l2-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
-                            </div>
-                        </div>
-
-                        <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-amber-500/30">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-sm text-amber-300">CAMPO ROM ⛺</span>
-                                <span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded">3 Posti</span>
-                            </div>
-                            <div class="space-y-2">
-                                <input type="text" id="bed-rom-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
-                                <input type="text" id="bed-rom-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
-                                <input type="text" id="bed-rom-3" oninput="saveBeds()" placeholder="Persona 3" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
-                            </div>
-                        </div>
-
-                        <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-cyan-500/30">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-sm text-cyan-300">LETTO #1</span>
-                                <span class="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">2 Posti</span>
-                            </div>
-                            <div class="space-y-2">
-                                <input type="text" id="bed-l1-1" oninput="saveBeds()" placeholder="Persona 1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
-                                <input type="text" id="bed-l1-2" oninput="saveBeds()" placeholder="Persona 2" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
-                            </div>
-                        </div>
-
-                        <div class="col-span-12 md:col-span-6 glass-card p-4 rounded-xl border border-pink-500/30">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-sm text-pink-300">DIVANO (Opzione #2) 🛋️</span>
-                                <span class="text-xs bg-pink-500/20 text-pink-400 px-2 py-0.5 rounded">1-2 Posti</span>
-                            </div>
-                            <p class="text-[10px] text-slate-400 mb-2">*Uno o due possono spostarsi qui per stare più comodi.</p>
-                            <div class="space-y-2">
-                                <input type="text" id="bed-divano-1" oninput="saveBeds()" placeholder="Persona sul divano" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-800 text-xs text-slate-400">
-                        <span><i class="fa-solid fa-suitcase text-cyan-400 mr-1"></i> Zona Valigie dedicata</span>
-                        <span><i class="fa-solid fa-box text-cyan-400 mr-1"></i> Spazio sotto i letti</span>
-                    </div>
-                </div>
-
-                <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-lg mb-3 text-cyan-300">Regole del Pernottamento</h3>
-                        <ul class="space-y-3 text-xs text-slate-300">
-                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50"><strong>Opzione 1 (Standard):</strong> 2 su Letto #1, 2 su Letto #2, 3 in Campo ROM.</li>
-                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50"><strong>Opzione 2 (Divano):</strong> Uno o due traslocano sul divano per allargare il Campo ROM.</li>
-                            <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50">🧹 <strong>Compito:</strong> Spolverare i compartimenti sotto i letti prima di sistemare le valigie.</li>
-                        </ul>
-                    </div>
-                    <div class="mt-4 p-3 bg-cyan-950/40 border border-cyan-800/40 rounded-xl text-center">
-                        <p class="text-xs text-cyan-200">Assegnazioni salvate in automatico in questo browser.</p>
-                    </div>
-                </div>
+            <div class="glass-panel rounded-2xl p-4 border border-slate-700">
+<svg id="plan" viewBox="-35 -35 589 410" class="w-full h-auto" role="img" aria-label="Planimetria della stanza con letti, campo ROM, mobili, finestra e porta">
+<defs><pattern id="hatch" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V16M0 0H16" stroke="#ef4444" stroke-width="3" stroke-opacity=".5" fill="none"/></pattern></defs>
+<rect x="0" y="0" width="519" height="279" fill="#1e293b"/>
+<rect x="280" y="0" width="145" height="279" fill="#334155" fill-opacity=".45"/>
+<rect x="2" y="92" width="268" height="128" fill="url(#hatch)" stroke="#ef4444" stroke-opacity=".6"/>
+<rect x="2" y="0" width="263" height="87" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="2"/><rect x="10" y="12" width="26" height="55" rx="5" fill="#a5b4fc" fill-opacity=".3"/>
+<rect x="425" y="0" width="94" height="279" rx="6" fill="#083344" stroke="#06b6d4" stroke-width="2"/><rect x="433" y="8" width="78" height="26" rx="5" fill="#67e8f9" fill-opacity=".3"/>
+<rect x="290" y="0" width="114" height="70" rx="4" fill="#475569" stroke="#94a3b8"/><text x="347" y="40" fill="#e2e8f0" font-size="14" text-anchor="middle" font-weight="700">Mobile</text>
+<rect x="2" y="222" width="278" height="57" rx="4" fill="#475569" stroke="#94a3b8"/><text x="141" y="256" fill="#e2e8f0" font-size="14" text-anchor="middle" font-weight="700">Mobile</text>
+<g fill="#475569" stroke="#0f172a" stroke-width="2"><rect x="-35" y="-35" width="589" height="35"/><rect x="519" y="-35" width="35" height="349"/><rect x="-35" y="-35" width="35" height="130"/><rect x="-35" y="182" width="35" height="132"/><rect x="-35" y="279" width="386" height="35"/><rect x="425" y="279" width="129" height="35"/></g>
+<rect x="-35" y="95" width="35" height="87" fill="#0ea5e9" fill-opacity=".35" stroke="#38bdf8"/><text x="-12" y="138" fill="#bae6fd" font-size="11" text-anchor="middle" transform="rotate(-90 -12 138)">finestra</text>
+<path d="M351 279A74 74 0 0 0 425 353M425 279V353" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 4"/><text x="390" y="318" fill="#94a3b8" font-size="10" text-anchor="middle">porta</text>
+<g class="slot" data-in="bed-l2-1"><rect x="44" y="8" width="105" height="71" rx="8" fill="#312e81" fill-opacity=".6" stroke="#818cf8" stroke-width="2"/><text x="96.5" y="35.5" fill="#94a3b8" font-size="9" text-anchor="middle">Letto #2</text><text id="pl-bed-l2-1" x="96.5" y="55.5" fill="#64748b" font-size="16" font-weight="700" text-anchor="middle">libero</text></g><g class="slot" data-in="bed-l2-2"><rect x="156" y="8" width="105" height="71" rx="8" fill="#312e81" fill-opacity=".6" stroke="#818cf8" stroke-width="2"/><text x="208.5" y="35.5" fill="#94a3b8" font-size="9" text-anchor="middle">Letto #2</text><text id="pl-bed-l2-2" x="208.5" y="55.5" fill="#64748b" font-size="16" font-weight="700" text-anchor="middle">libero</text></g><g class="slot" data-in="bed-l1-1"><rect x="431" y="40" width="82" height="112" rx="8" fill="#164e63" fill-opacity=".6" stroke="#22d3ee" stroke-width="2"/><text x="472.0" y="88.0" fill="#94a3b8" font-size="9" text-anchor="middle">Letto #1</text><text id="pl-bed-l1-1" x="472.0" y="108.0" fill="#64748b" font-size="16" font-weight="700" text-anchor="middle">libero</text></g><g class="slot" data-in="bed-l1-2"><rect x="431" y="158" width="82" height="112" rx="8" fill="#164e63" fill-opacity=".6" stroke="#22d3ee" stroke-width="2"/><text x="472.0" y="206.0" fill="#94a3b8" font-size="9" text-anchor="middle">Letto #1</text><text id="pl-bed-l1-2" x="472.0" y="226.0" fill="#64748b" font-size="16" font-weight="700" text-anchor="middle">libero</text></g><g class="slot" data-in="bed-rom-1"><rect x="8" y="98" width="80" height="116" rx="8" fill="#0f172a" fill-opacity=".6" stroke="#fca5a5" stroke-width="2"/><text x="48.0" y="148.0" fill="#94a3b8" font-size="9" text-anchor="middle">Campo ROM</text><text id="pl-bed-rom-1" x="48.0" y="168.0" fill="#64748b" font-size="16" font-weight="700" text-anchor="middle">libero</text></g><g class="slot" data-in="bed-rom-2"><rect x="98" y="98" width="80" height="116" rx="8" fill="#0f172a" fill-opacity=".6" stroke="#fca5a5" stroke-width="2"/><text x="138.0" y="148.0" fill="#94a3b8" font-size="9" text-anchor="middle">Campo ROM</text><text id="pl-bed-rom-2" x="138.0" y="168.0" fill="#64748b" font-size="16" font-weight="700" text-anchor="middle">libero</text></g><g class="slot" data-in="bed-rom-3"><rect x="188" y="98" width="80" height="116" rx="8" fill="#0f172a" fill-opacity=".6" stroke="#fca5a5" stroke-width="2"/><text x="228.0" y="148.0" fill="#94a3b8" font-size="9" text-anchor="middle">Campo ROM</text><text id="pl-bed-rom-3" x="228.0" y="168.0" fill="#64748b" font-size="16" font-weight="700" text-anchor="middle">libero</text></g><g class="slot" data-in="bed-divano-1"><rect x="436" y="324" width="110" height="44" rx="8" fill="#831843" fill-opacity=".6" stroke="#f472b6" stroke-width="2" stroke-dasharray="6 4"/><text x="491.0" y="338.0" fill="#94a3b8" font-size="9" text-anchor="middle">Divano (piano di sotto)</text><text id="pl-bed-divano-1" x="491.0" y="358.0" fill="#64748b" font-size="16" font-weight="700" text-anchor="middle">libero</text></g>
+</svg>
+                <p class="text-[10px] text-slate-500 text-center mt-2">Piantina in scala indicativa. Il campo ROM è la zona tratteggiata.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4"><div class="glass-card p-4 rounded-xl border border-indigo-500/30"><div class="flex justify-between items-center mb-2"><span class="font-bold text-sm text-indigo-300">LETTO #2</span><span class="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded">2 Posti</span></div><div class="space-y-2"><input type="text" id="bed-l2-1" oninput="saveBeds()" placeholder="Persona 1" maxlength="30" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"><input type="text" id="bed-l2-2" oninput="saveBeds()" placeholder="Persona 2" maxlength="30" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"></div></div><div class="glass-card p-4 rounded-xl border border-cyan-500/30"><div class="flex justify-between items-center mb-2"><span class="font-bold text-sm text-cyan-300">LETTO #1</span><span class="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded">2 Posti</span></div><div class="space-y-2"><input type="text" id="bed-l1-1" oninput="saveBeds()" placeholder="Persona 1" maxlength="30" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"><input type="text" id="bed-l1-2" oninput="saveBeds()" placeholder="Persona 2" maxlength="30" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"></div></div><div class="glass-card p-4 rounded-xl border border-amber-500/30"><div class="flex justify-between items-center mb-2"><span class="font-bold text-sm text-amber-300">CAMPO ROM</span><span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded">3 Posti</span></div><div class="space-y-2"><input type="text" id="bed-rom-1" oninput="saveBeds()" placeholder="Persona 1" maxlength="30" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"><input type="text" id="bed-rom-2" oninput="saveBeds()" placeholder="Persona 2" maxlength="30" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"><input type="text" id="bed-rom-3" oninput="saveBeds()" placeholder="Persona 3" maxlength="30" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"></div></div><div class="glass-card p-4 rounded-xl border border-pink-500/30"><div class="flex justify-between items-center mb-2"><span class="font-bold text-sm text-pink-300">DIVANO (piano di sotto)</span><span class="text-xs bg-pink-500/20 text-pink-400 px-2 py-0.5 rounded">1 Posto</span></div><div class="space-y-2"><input type="text" id="bed-divano-1" oninput="saveBeds()" placeholder="Persona sul divano" maxlength="30" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"></div></div></div>
+            <div class="glass-panel rounded-2xl p-5">
+                <h3 class="font-bold text-cyan-300 mb-3">Regole del pernottamento</h3>
+                <ul class="space-y-2 text-xs text-slate-300">
+                    <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50"><strong>8 posti per 7 persone:</strong> uno resta libero, ed è il più fortunato.</li>
+                    <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50"><strong>Letti singoli, ma da due:</strong> ce li facciamo bastare. Il divano è al piano di sotto e ha un solo posto.</li>
+                    <li class="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50"><strong>Compito:</strong> spolverare sotto i letti prima di sistemare le valigie.</li>
+                </ul>
             </div>
         </section>
 
@@ -781,7 +669,7 @@
         resizeCanvas();
 
         function createFlakes() {
-            const count = Math.floor(window.innerWidth / 15);
+            const count = Math.floor(window.innerWidth / 15 * (1 + 2 * (window.HYPE || 0)));
             flakes = [];
             for (let i = 0; i < count; i++) {
                 flakes.push({
@@ -824,10 +712,10 @@
         }
         drawSnow();
 
-        const targetDate = new Date("December 22, 2026 17:00:00").getTime();
+        const targetDate = DEPART;
 
         function updateCountdown() {
-            const now = new Date().getTime();
+            const now = nowMs();
             const difference = targetDate - now;
 
             if (difference > 0) {
@@ -886,7 +774,7 @@
             }
 
             let skipassVal = skipassChecked ? 22 : 0;
-            let assVal = assChecked ? 5 : 0;
+            let assVal = assChecked ? 6 : 0;
             const extraInput = document.getElementById('calc-extra');
             let extraVal = extraInput ? Math.max(0, parseFloat(extraInput.value) || 0) : 0;
 
@@ -1138,6 +1026,7 @@ function logH(t) {
   db.collection('history').add({uid: u.uid, name: who(), text: t, ts: firebase.firestore.FieldValue.serverTimestamp()}).catch(console.error);
 }
 function renderHistory(s) {
+  lastHist = s.empty ? null : s.docs[0].data({serverTimestamps: 'estimate'}); updateLive();
   const c = $('history-list');
   c.innerHTML = s.empty ? '<p class="text-xs text-slate-400">Ancora nessuna modifica.</p>' : '';
   s.forEach(doc => {
@@ -1171,10 +1060,11 @@ function renderShared(cid, items, key) {
 const BL = {l1:'Letto #1', l2:'Letto #2', rom:'Campo Rom', divano:'Divano'};
 function applyBeds() {
   bedInputs.forEach(id => { const el = $(id); if (el && el !== document.activeElement) el.value = S.beds[id] || ''; });
+  paintPlan();
 }
 let bt;
 window.saveBeds = () => {
-  clearTimeout(bt);
+  paintPlan(); clearTimeout(bt);
   bt = setTimeout(() => {
     const ch = {}, old = {...S.beds};
     bedInputs.forEach(id => { const v = ($(id).value || '').trim(); if (v !== (old[id] || '')) ch[id] = v; });
@@ -1297,6 +1187,7 @@ function renderChat(s) {
     b.append(h, x, m); w.appendChild(b); c.appendChild(w);
   });
   if (!n) c.innerHTML = '<p class="text-xs text-slate-400 text-center">Nessun messaggio. Scrivi il primo!</p>';
+  lastChat = docs.map(d => d.data({serverTimestamps: 'estimate'})).find(d => !(d.expireAt && d.expireAt.toDate() < new Date())) || null; updateLive();
   if (nearEnd || chatFirst || lastMine) c.scrollTop = c.scrollHeight;
   chatFirst = false;
 }
@@ -1313,6 +1204,81 @@ window.switchTab = n => {
   if (n === 'chat') { $('chat-dot').classList.add('hidden'); const c = $('chat-list'); c.scrollTop = c.scrollHeight; }
 };
 
+/* ---------- PIANTINA E HOME ---------- */
+let lastHist = null, lastChat = null;
+function paintPlan() {
+  bedInputs.forEach(id => {
+    const t = $('pl-' + id), el = $(id); if (!t || !el) return;
+    const v = (el.value || '').trim();
+    const mx = /rom|l1/.test(id) ? 7 : 9;
+    t.textContent = v ? (v.length > mx ? v.slice(0, mx - 1) + '…' : v) : 'libero';
+    t.setAttribute('fill', v ? '#f8fafc' : '#64748b');
+  });
+}
+document.querySelectorAll('#plan .slot').forEach(g => {
+  g.onclick = () => { const el = $(g.dataset.in); if (el) { el.focus(); el.scrollIntoView({behavior: 'smooth', block: 'center'}); } };
+});
+function updateLive() {
+  const n = o => Object.values(o || {}).filter(Boolean).length;
+  $('live-spesa').textContent = n(S.grocery) + ' / ' + groceryData.length + ' prese';
+  $('live-obj').textContent = n(S.goals) + ' / ' + goalsData.length + ' fatti';
+  $('live-letti').textContent = bedInputs.filter(id => S.beds[id]).length + ' / ' + bedInputs.length + ' assegnati';
+  $('live-hist').textContent = lastHist ? lastHist.name + ' ' + lastHist.text : 'Nessuna modifica';
+  $('live-chat').textContent = lastChat ? lastChat.name + ': ' + lastChat.text : 'Nessun messaggio';
+}
+const FACTS = [
+  ['Quando', '22–24 dicembre 2026'],
+  ['Dove', "Piancavallo, a casa di Boz (gratis: non il Ritz, ma meglio di niente)"],
+  ['Gruppo', '7 persone'],
+  ['Partenza', '22/12 tra le 15:00 e le 16:00'],
+  ['Mezzo', 'Da definire: autobus, passaggi dei genitori o ognuno per sé'],
+  ['Rientro', '24/12 dopo pranzo (orario da definire)']
+];
+$('facts').innerHTML = FACTS.map(f => '<div class="flex justify-between gap-4 py-2 border-b border-slate-800 last:border-0"><span class="text-[10px] uppercase tracking-[0.2em] text-slate-400 shrink-0">' + f[0] + '</span><span class="text-sm text-slate-200 text-right">' + f[1] + '</span></div>').join('');
+const PRE_MSG = [
+  [30, "Più di un mese al via. Tranquilli: per ora l'unico allenamento è scrollare questo sito."],
+  [14, 'Si comincia a fare sul serio: guardate la lista della spesa e fate pace con le sveglie presto.'],
+  [6, 'Meno di due settimane. Gli sci non si preparano da soli, e nemmeno i bagigi.'],
+  [2, "Fase \"valigia aperta sul letto da tre giorni\". Spuntate la lista e smettete di dire \"ho tutto\"."],
+  [1, 'Ci siamo quasi. Caricate il telefono, chiudete la valigia e salutate la civiltà.'],
+  [0, 'Oggi si parte. Valigia, caricatore, bagigi: in quest\'ordine.']
+];
+const TRIP = [
+  ['Arrivo & Setup', 'Si parte, si arriva, si cena. In ordine di importanza: cena.'],
+  ['Full Ski Experience', 'Giorno di sci. Si scia finché le gambe dicono basta, poi ancora un giro.'],
+  ['Alba & Rientro', "Ultimo giro e rientro dopo pranzo. Fate che sia memorabile."]
+];
+function homeInit() {
+  const now = nowMs(), left = DEPART - now, d = left / 864e5, pre = left > 0, trip = !pre && now < new Date('2026-12-25T00:00:00').getTime();
+  $('home-pre').classList.toggle('hidden', !pre);
+  $('home-trip').classList.toggle('hidden', pre);
+  $('cd-wrap').classList.toggle('hidden', !pre);
+  if (pre) {
+    const dd = Math.floor(d), hh = Math.max(1, Math.floor(left / 36e5));
+    $('home-title').textContent = dd >= 1 ? 'Mancano ' + dd + (dd === 1 ? ' giorno' : ' giorni') : 'Mancano ' + hh + (hh === 1 ? ' ora' : ' ore');
+    $('home-msg').textContent = (PRE_MSG.find(m => d > m[0]) || PRE_MSG[5])[1];
+    $('hype-pct').textContent = Math.round(HYPE * 100) + '%';
+    $('hype-bar').style.width = (HYPE * 100) + '%';
+    return;
+  }
+  const day = new Date(now).getDate(), idx = Math.max(0, [22, 23, 24].indexOf(day)), slot = $('trip-slot');
+  if (!trip) {
+    $('trip-day').textContent = 'Fine della corsa';
+    $('trip-title').textContent = 'Missione compiuta';
+    $('trip-msg').textContent = 'Grazie a Boz per la casa e a tutti per il caos felice. Alla prossima stagione.';
+    slot.innerHTML = ''; return;
+  }
+  $('trip-day').textContent = 'Oggi · ' + day + ' dicembre';
+  $('trip-title').textContent = TRIP[idx][0];
+  $('trip-msg').textContent = TRIP[idx][1];
+  if (slot.dataset.d !== String(idx)) {
+    const c = $('prog-d' + (idx + 1)).cloneNode(true);
+    c.removeAttribute('id'); c.classList.add('trip-card');
+    slot.innerHTML = ''; slot.appendChild(c); slot.dataset.d = String(idx);
+  }
+}
+paintPlan(); updateLive(); homeInit(); setInterval(homeInit, 30000);
+
 /* ---------- ASCOLTO DATI ---------- */
 function startListeners() {
   const err = e => console.error(e);
@@ -1324,7 +1290,7 @@ function startListeners() {
     S = {goals: d.goals || {}, grocery: d.grocery || {}, beds: d.beds || {}};
     renderShared('goals-container', goalsData, 'goals');
     renderShared('grocery-list-container', groceryData, 'grocery');
-    applyBeds();
+    applyBeds(); updateLive();
   }, e => {
     if (e.code === 'permission-denied') showGate('blocked', 'Questo account (' + auth.currentUser.email + ') non è nella lista degli amici autorizzati. Chiedi di essere aggiunto, poi esci e rientra.');
     else console.error(e);
