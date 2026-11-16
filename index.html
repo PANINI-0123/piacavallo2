@@ -142,7 +142,7 @@ header.glass-panel{box-shadow:0 0 calc(var(--hype)*60px) rgba(236,72,153,calc(va
 .w-flake{animation:wflake 1s cubic-bezier(.2,.9,.3,1.2) both;filter:drop-shadow(0 0 24px #22d3ee)}
 .w-line{animation:wline .7s ease-out both}
 #welcome.out{animation:wout .6s ease-in forwards}
-body.reveal > div:not([id]){animation:rise .8s 1.6s cubic-bezier(.2,.8,.2,1) both}
+body.reveal > div:not([id]){animation:rise .8s 2.7s cubic-bezier(.2,.8,.2,1) both}
 @media (prefers-reduced-motion:reduce){.ld-flake,.ld-ski,.pop,.w-flake,.w-line,#welcome{animation:none!important}}
 </style>
 <style>body:not(.auth-ok) > *:not(#authGate):not(#privacyModal):not(#welcome):not(script){display:none!important}</style>
@@ -657,6 +657,7 @@ body.reveal > div:not([id]){animation:rise .8s 1.6s cubic-bezier(.2,.8,.2,1) bot
         <p class="mt-6 text-xs tracking-[0.4em] uppercase text-cyan-300 w-line" style="animation-delay:.3s">Benvenuto</p>
         <h2 id="w-name" class="text-4xl md:text-6xl font-black text-white w-line" style="animation-delay:.45s"></h2>
         <p class="mt-3 text-sm text-slate-400 w-line" style="animation-delay:.7s">Piancasballo Season #2</p>
+        <canvas id="w-ski" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
     </div>
 
     <div id="lightbox" class="hidden fixed inset-0 bg-slate-950/90 flex-col items-center justify-center p-4 gap-3" style="z-index:55" onclick="if(event.target===this)closeLightbox()">
@@ -1324,15 +1325,63 @@ function reveal() {
     b.appendChild(d);
   }
   const w = $('welcome'); w.classList.remove('hidden', 'out'); w.classList.add('flex');
-  setTimeout(() => endWelcome(false), 1700);
-  setTimeout(() => document.body.classList.remove('reveal'), 3400);
+  skiRun();
+  setTimeout(() => endWelcome(false), 2800);
+  setTimeout(() => document.body.classList.remove('reveal'), 4200);
 }
 function endWelcome(skip) {
   const w = $('welcome');
   if (w.classList.contains('hidden') || w.classList.contains('out')) return;
   if (skip) document.body.classList.remove('reveal');
   w.classList.add('out');
-  setTimeout(() => { w.classList.add('hidden'); w.classList.remove('flex', 'out'); }, 600);
+  setTimeout(() => { w.classList.add('hidden'); w.classList.remove('flex', 'out'); cancelAnimationFrame(skiRAF); }, 600);
+}
+
+/* ---------- SCIATORE CON SCIA DI NEVE ---------- */
+let skiRAF = 0;
+function skiRun() {
+  const cv = $('w-ski'), x = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1);
+  const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
+  const fam = getComputedStyle(document.querySelector('#welcome .w-flake')).fontFamily;
+  const size = Math.max(56, Math.min(W, H) / 9), t0 = performance.now() + 900, dur = 1700;
+  const trail = [], sp = [];
+  let sk = null, last = performance.now();
+  const at = p => { const t = Math.pow(p, 1.35); return [W * (-0.06 + 1.12 * t), H * (0.03 + 0.94 * t) + Math.sin(t * 8) * H * 0.035 * (1 - 0.4 * t)]; };
+  cancelAnimationFrame(skiRAF);
+  (function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    x.clearRect(0, 0, W, H);
+    const p = Math.max(0, Math.min(1, (now - t0) / dur));
+    if (now >= t0 && p < 1) {
+      const a = at(p), b = at(Math.min(1, p + 0.01)), ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+      sk = [a[0], a[1], ang]; trail.push([a[0], a[1], ang, now]);
+      for (let i = 0; i < 3; i++) sp.push({x: a[0], y: a[1], vx: (Math.random() - 0.6) * 140 * dpr - Math.cos(ang) * 50 * dpr, vy: -Math.random() * 130 * dpr, r: (1.5 + Math.random() * 3.5) * dpr, life: 0, max: 0.7 + Math.random() * 0.8});
+    }
+    x.lineCap = 'round'; x.shadowColor = '#22d3ee'; x.shadowBlur = 10 * dpr;
+    for (const side of [-1, 1]) {
+      for (let i = 1; i < trail.length; i++) {
+        const q = trail[i], r = trail[i - 1], al = Math.max(0, 1 - (now - q[3]) / 1500) * 0.8;
+        if (al <= 0) continue;
+        const o = side * 5 * dpr;
+        x.strokeStyle = 'rgba(255,255,255,' + al + ')'; x.lineWidth = 2 * dpr;
+        x.beginPath(); x.moveTo(r[0] - Math.sin(r[2]) * o, r[1] + Math.cos(r[2]) * o); x.lineTo(q[0] - Math.sin(q[2]) * o, q[1] + Math.cos(q[2]) * o); x.stroke();
+      }
+    }
+    x.shadowBlur = 0;
+    for (let i = sp.length - 1; i >= 0; i--) {
+      const q = sp[i]; q.life += dt; q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 220 * dpr * dt;
+      if (q.life >= q.max) { sp.splice(i, 1); continue; }
+      x.fillStyle = 'rgba(255,255,255,' + (1 - q.life / q.max) * 0.9 + ')';
+      x.beginPath(); x.arc(q.x, q.y, q.r, 0, 6.283); x.fill();
+    }
+    if (sk && p < 1) {
+      x.save(); x.translate(sk[0], sk[1]); x.rotate(sk[2] * 0.5);
+      x.font = '900 ' + size + 'px ' + fam; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.shadowColor = '#22d3ee'; x.shadowBlur = 22 * dpr; x.fillStyle = '#e0f2fe';
+      x.fillText('\uf7c9', 0, 0); x.restore();
+    }
+    if (now < t0 + dur + 1600) skiRAF = requestAnimationFrame(frame);
+  })(performance.now());
 }
 
 /* ---------- ASCOLTO DATI ---------- */
