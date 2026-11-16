@@ -128,8 +128,24 @@ header.glass-panel{box-shadow:0 0 calc(var(--hype)*60px) rgba(236,72,153,calc(va
 #trip-slot li{font-size:1rem}
 #plan .slot{cursor:pointer}
 #plan .slot:hover rect{stroke-width:3}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes ski{from{left:-10%}to{left:104%}}
+@keyframes pop{from{opacity:.4;transform:scale(.94)}to{opacity:1;transform:none}}
+@keyframes wflake{0%{transform:scale(.2) rotate(-180deg);opacity:0}60%{transform:scale(1.25) rotate(20deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes wline{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes burst{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--x),var(--y)) scale(.2);opacity:0}}
+@keyframes wout{to{opacity:0;transform:scale(1.15)}}
+@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+.ld-flake{animation:spin 2.4s linear infinite;filter:drop-shadow(0 0 14px #22d3ee)}
+.ld-ski{animation:ski 1.5s linear infinite;left:-10%}
+.pop{animation:pop .35s ease-out}
+.w-flake{animation:wflake 1s cubic-bezier(.2,.9,.3,1.2) both;filter:drop-shadow(0 0 24px #22d3ee)}
+.w-line{animation:wline .7s ease-out both}
+#welcome.out{animation:wout .6s ease-in forwards}
+body.reveal > div:not([id]){animation:rise .8s 1.6s cubic-bezier(.2,.8,.2,1) both}
+@media (prefers-reduced-motion:reduce){.ld-flake,.ld-ski,.pop,.w-flake,.w-line,#welcome{animation:none!important}}
 </style>
-<style>body:not(.auth-ok) > *:not(#authGate):not(#privacyModal):not(script){display:none!important}</style>
+<style>body:not(.auth-ok) > *:not(#authGate):not(#privacyModal):not(#welcome):not(script){display:none!important}</style>
 </head>
 <body class="relative min-h-screen text-slate-100">
 <script>
@@ -582,8 +598,12 @@ header.glass-panel{box-shadow:0 0 calc(var(--hype)*60px) rgba(236,72,153,calc(va
     </div>
 
     <div id="authGate" class="fixed inset-0 flex items-center justify-center p-4 bg-slate-950" style="z-index:60">
-        <div class="glass-panel rounded-2xl p-6 max-w-sm w-full space-y-3">
+        <div id="gateCard" class="glass-panel rounded-2xl p-6 max-w-sm w-full space-y-3">
             <h2 class="text-xl font-black text-cyan-300 text-center">❄️ PIANCASBALLO</h2>
+            <div id="ld-anim" class="py-2 text-center">
+                <i class="fa-solid fa-snowflake ld-flake text-5xl text-cyan-300"></i>
+                <div class="relative h-8 mt-3 overflow-hidden rounded-full bg-slate-800/70"><i class="fa-solid fa-person-skiing absolute top-1 text-cyan-300 ld-ski"></i></div>
+            </div>
             <div id="authForm" class="hidden space-y-3">
                 <p class="text-xs text-slate-400 text-center">Area riservata agli amici del gruppo</p>
                 <input id="nameInput" type="text" placeholder="Il tuo nome" class="hidden w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500">
@@ -629,6 +649,14 @@ header.glass-panel{box-shadow:0 0 calc(var(--hype)*60px) rgba(236,72,153,calc(va
             <p>Puoi chiedere accesso, rettifica, cancellazione, limitazione, portabilità dei dati e opporti al trattamento (artt. 15-22 GDPR), oltre a revocare il consenso. Hai inoltre il diritto di proporre reclamo al Garante per la protezione dei dati personali (garanteprivacy.it). Il conferimento dei dati è facoltativo, ma senza di essi non è possibile accedere all'area riservata.</p>
             <button onclick="closePrivacy()" class="w-full py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm rounded-xl transition">Chiudi</button>
         </div>
+    </div>
+
+    <div id="welcome" class="hidden fixed inset-0 flex-col items-center justify-center bg-slate-950 text-center px-4" style="z-index:80" onclick="endWelcome(true)">
+        <div id="w-burst" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+        <i class="fa-solid fa-snowflake w-flake text-7xl text-cyan-300"></i>
+        <p class="mt-6 text-xs tracking-[0.4em] uppercase text-cyan-300 w-line" style="animation-delay:.3s">Benvenuto</p>
+        <h2 id="w-name" class="text-4xl md:text-6xl font-black text-white w-line" style="animation-delay:.45s"></h2>
+        <p class="mt-3 text-sm text-slate-400 w-line" style="animation-delay:.7s">Piancasballo Season #2</p>
     </div>
 
     <div id="lightbox" class="hidden fixed inset-0 bg-slate-950/90 flex-col items-center justify-center p-4 gap-3" style="z-index:55" onclick="if(event.target===this)closeLightbox()">
@@ -967,6 +995,8 @@ function showGate(state, text) {
   document.body.classList.remove('auth-ok');
   $('authGate').classList.remove('hidden');
   $('verifyOut').classList.toggle('hidden', state === 'loading');
+  $('ld-anim').classList.toggle('hidden', state !== 'loading');
+  const gc = $('gateCard'); gc.classList.remove('pop'); void gc.offsetWidth; gc.classList.add('pop');
   $('authForm').classList.toggle('hidden', state !== 'form');
   $('verifyBox').classList.toggle('hidden', state === 'form');
   $('verifyDone').classList.toggle('hidden', state !== 'verify');
@@ -1013,7 +1043,7 @@ $('verifyResend').onclick = async () => {
 auth.onAuthStateChanged(u => {
   unsubs.forEach(f => f()); unsubs = [];
   $('user-btn').classList.add('hidden'); $('user-btn').classList.remove('flex');
-  if (!u) { S = {goals:{}, grocery:{}, beds:{}}; showGate('form'); return; }
+  if (!u) { S = {goals:{}, grocery:{}, beds:{}}; revealed = false; showGate('form'); return; }
   if (!u.emailVerified) { showGate('verify', 'Ti abbiamo mandato un\'email di verifica a ' + u.email + '. Clicca il link nel messaggio, poi premi il pulsante qui sotto.'); return; }
   showGate('loading', 'Caricamento...');
   setUserBtn(); startListeners();
@@ -1278,12 +1308,39 @@ function homeInit() {
 }
 paintPlan(); updateLive(); homeInit(); setInterval(homeInit, 30000);
 
+/* ---------- ANIMAZIONE DI BENVENUTO ---------- */
+let revealed = false;
+function reveal() {
+  document.body.classList.add('auth-ok');
+  if (revealed || matchMedia('(prefers-reduced-motion: reduce)').matches) { revealed = true; return; }
+  revealed = true;
+  document.body.classList.add('reveal');
+  $('w-name').textContent = who();
+  const b = $('w-burst'); b.innerHTML = '';
+  const cols = ['#22d3ee', '#f472b6', '#ffffff', '#a5b4fc'];
+  for (let i = 0; i < 32; i++) {
+    const d = document.createElement('span'), a = Math.random() * 6.28, r = 140 + Math.random() * 320, z = 4 + Math.random() * 7;
+    d.style.cssText = 'position:absolute;left:50%;top:42%;border-radius:50%;width:' + z + 'px;height:' + z + 'px;background:' + cols[i % 4] + ';--x:' + Math.cos(a) * r + 'px;--y:' + Math.sin(a) * r + 'px;animation:burst 1.3s ' + (0.5 + Math.random() * 0.4) + 's ease-out both';
+    b.appendChild(d);
+  }
+  const w = $('welcome'); w.classList.remove('hidden', 'out'); w.classList.add('flex');
+  setTimeout(() => endWelcome(false), 1700);
+  setTimeout(() => document.body.classList.remove('reveal'), 3400);
+}
+function endWelcome(skip) {
+  const w = $('welcome');
+  if (w.classList.contains('hidden') || w.classList.contains('out')) return;
+  if (skip) document.body.classList.remove('reveal');
+  w.classList.add('out');
+  setTimeout(() => { w.classList.add('hidden'); w.classList.remove('flex', 'out'); }, 600);
+}
+
 /* ---------- ASCOLTO DATI ---------- */
 function startListeners() {
   const err = e => console.error(e);
   chatFirst = true; cleanupChat();
   unsubs.push(STATE.onSnapshot(s => {
-    $('authGate').classList.add('hidden'); document.body.classList.add('auth-ok');
+    $('authGate').classList.add('hidden'); reveal();
     $('user-btn').classList.remove('hidden'); $('user-btn').classList.add('flex');
     const d = s.data() || {};
     S = {goals: d.goals || {}, grocery: d.grocery || {}, beds: d.beds || {}};
